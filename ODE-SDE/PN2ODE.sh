@@ -28,6 +28,7 @@ then
     echo "       -G ->   Export in GPU format"
     echo "       -Z ->   Generate Compact CPP code"
     echo "       -H ->   Enable Flux Balance"
+    echo "       -E ->   Embedding simulation"
     echo
 
     echo "Please, be aware that:"
@@ -122,6 +123,11 @@ case "$1" in
     fi
     shift
     ;;
+    
+    
+    -E)
+    BRANCHFLAG=true
+    ;;
 
     *)
     printf "**ERROR** Invalid Options.You can check syntax rules by executing PN2ODE.sh -help.\n\n"
@@ -137,15 +143,21 @@ done
 echo ${FLUXNAMEFILE[@]}
 
 echo "Compiling general transition file"
+
 if [ "$FLUXFLAG" == "true" ]
 then
+	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp -flux
+	
+elif [ "$BRANCHFLAG" == "true" ]
+then
+	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp -branch
+	
+else
+	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp
 
-		java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp -flux
-		CFUN_PATH=$(perl -e "use File::Spec; print(File::Spec->rel2abs(\"./gen_tran_out.cpp\"),\"\n\")")
-	else
-		java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp
-		CFUN_PATH=$(perl -e "use File::Spec; print(File::Spec->rel2abs(\"./gen_tran_out.cpp\"),\"\n\")")		
 fi
+
+CFUN_PATH=$(perl -e "use File::Spec; print(File::Spec->rel2abs(\"./gen_tran_out.cpp\"),\"\n\")")		
 
 
 echo "#Computing p-semiflows and place bounds: "

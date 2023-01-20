@@ -457,7 +457,7 @@ else
 }
     //automaton
     out<<"std::cerr<<\"\\n\\n\\tOPTIONS\\n\";\n\t";
-    out << " std::cerr<<\"\\n\\t -type <type>:\\t\\t ODE-E or ODE-RKF or ODE45 or LSODA or HLSODA or (H)SDE or HODE or SSA or TAUG or STEP. Default: LSODA \";\n\t";
+    out << " std::cerr<<\"\\n\\t -type <type>:\\t\\t ODE-E or ODE-RKF or ODE45 or LSODA or HLSODA or (H)SDE or HODE or SSA or TAUG or STEP or BRANCH. Default: LSODA \";\n\t";
     out << " std::cerr<<\"\\n\\t -hini <double>:\\t Initial step size. Default: 1e-6\";\n\t";
     out << " std::cerr<<\"\\n\\t -atol <double>:\\t Absolute error tolerance. Dafault: 1e-6\";\n\t";
     out << " std::cerr<<\"\\n\\t -rtol <double>:\\t Relative error tolerance. Dafault: 1e-6\";\n\t";
@@ -467,6 +467,7 @@ else
     out << " std::cerr<<\"\\n\\t -stime <double>:\\t Double number used to set the step in the output. Default: 0.0 (no output)\";\n\t";
     out << " std::cerr<<\"\\n\\t -itime <double>:\\t Double number used to set the initial simulation time. Default: 0.0 \";\n\t";
     out << " std::cerr<<\"\\n\\t -b <bound_file>:\\t Soft bound are defined in the file <bound_file>\";\n\t";
+    out << " std::cerr<<\"\\n\\t -branch <double>:\\t Delta used for the embedding simulation \";\n\t";
     out << " std::cerr<<\"\\n\\t -seed <double>:\\t Seed of random number generator\";\n\t";
     //variability 
     if (FLUXB){
@@ -503,6 +504,7 @@ out << "\t\t\t else if ((strcmp(argv[ii],\"HODE\")==0)||(strcmp(argv[ii],\"hode\
 out << "\t\t\t else if ((strcmp(argv[ii],\"HLSODA\")==0)||(strcmp(argv[ii],\"hlsoda\")==0)) SOLVE = 8;\n";
 out << "\t\t\t else if ((strcmp(argv[ii],\"SDE\")==0)||(strcmp(argv[ii],\"sde\")==0) || (strcmp(argv[ii],\"HSDE\")==0)||(strcmp(argv[ii],\"hsde\")==0) ) SOLVE = 0;\n";
 out << "\t\t\t else if ((strcmp(argv[ii],\"TAUG\")==0)||(strcmp(argv[ii],\"taug\")==0)) SOLVE = 9;\n";
+out << "\t\t\t else if ((strcmp(argv[ii],\"BRANCH\")==0)||(strcmp(argv[ii],\"branch\")==0)) SOLVE = 10;\n";
 out<<"\t\t\t else{\n";
 out<< "\t\t\t\t std::cerr<<\"\\n\\tError:  -type  <value>\\n\\n\";\n\t\t\t exit(EXIT_FAILURE);\n\t\t }\n";
 out<<"\t\t }\n";
@@ -621,6 +623,15 @@ out<< "\t\t\t std::cerr<<\"\\nError:  -parm  <file_name>\\n\";\n\t\t\t exit(EXIT
 out<<"\t\t continue;\n";
 out<<"\t }\n";
 
+//Delta for embedding simulation
+out<<"\t if (strcmp(\"-delta\", argv[ii])==0){\n";
+out<<"\t\t if (++ii<argc){\n";
+out<<"\t\t\t delta=atof(argv[ii]);\n\t\t }\n";
+out<<"\t\t else{\n";
+out<< "\t\t\t std::cerr<<\"\\nError:  -delta  <value>\\n\";\n\t\t\t exit(EXIT_FAILURE);\n\t\t }\n";
+out<<"\t\t continue;\n";
+out<<"\t }\n";
+
 out<< "\t\t\t std::cerr<<\"\\nError:  unknown parameter \"<<argv[ii]<<\"\\n\\n\";\n\t\t\t exit(EXIT_FAILURE);\n";
 out<<" }\n\n\n";
 
@@ -647,6 +658,7 @@ out << " cout<<\"\\tRelative tolerance: \"<<rtolODE<<\"\\n\";\n";
     out << " if (fbound!=\"\") cout<<\"\\tBound file: \"<<fbound<<\"\\n\";\n";
     out << " if (finit!=\"\") cout<<\"\\tInitial marking file: \"<<finit<<\"\\n\";\n";
     out << " if (fparm!=\"\") cout<<\"\\tInitial parameter file: \"<<fparm<<\"\\n\";\n";
+    out << " if (delta!=0) cout<<\"\\tDelta: \"<<delta<<\"\\n\";\n";
     //Variability
     if (FLUXB){
         out << " if (VARIABILITY) cout<<\"\\tEnable variability analysis.\\n\";\n";
@@ -924,7 +936,7 @@ for (pp = 0; pp < npl; pp++)
 
 
 
-    out << "\n\tif (SOLVE == 1)\n\t\t se.SolveODEEuler(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t else\n\t\t if (SOLVE == 0)\n\t\t\t se.SolveSDEEuler(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t else \n\t\t\tif (SOLVE == 3)\n\t\t\t\t se.SolveSSA(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]); \n\t\t\t else \n\t\t\t\t if (SOLVE == 4)\n\t\t\t\t\t  se.HeuristicStep(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 5)\n\t\t\t\t\t  se.SolveODERKF(hini,atolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\tif (SOLVE == 6)\n\t\t\t\t\t\t se.SolveODE45(hini,atolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 8)\n\t\t\t\t\t\t\t se.SolveHLSODE(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t\t\t\t else \n\t\t\t\t\t\t\t if (SOLVE == 7) \n\t\t\t\t\t\t\t\t se.SolveLSODE(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t\t\t\t else  \n\t\t\t\t\t\t\t\t se.SolveTAUG(ftime,runs,OUTPUT,stime,argv[1]);";
+    out << "\n\tif (SOLVE == 1)\n\t\t se.SolveODEEuler(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t else\n\t\t if (SOLVE == 0)\n\t\t\t se.SolveSDEEuler(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t else \n\t\t\tif (SOLVE == 3)\n\t\t\t\t se.SolveSSA(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]); \n\t\t\t else \n\t\t\t\t if (SOLVE == 4)\n\t\t\t\t\t  se.HeuristicStep(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 5)\n\t\t\t\t\t  se.SolveODERKF(hini,atolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\tif (SOLVE == 6)\n\t\t\t\t\t\t se.SolveODE45(hini,atolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 8)\n\t\t\t\t\t\t\t se.SolveHLSODE(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t\t\t\t else \n\t\t\t\t\t\t\t if (SOLVE == 7) \n\t\t\t\t\t\t\t\t se.SolveLSODE(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t\t\t\t else \n\t\t\t\t\t\t\t\t if (SOLVE == 10)  \n\t\t\t\t\t\t\t\t se.SolveBranchingMethod(ftime,runs,delta,OUTPUT,stime,argv[1]); \n\t\t\t\t\t\t\t else  \n\t\t\t\t\t\t\t\t se.SolveTAUG(ftime,runs,OUTPUT,stime,argv[1]);";
     out << "\n\tse.PrintStatistic(argv[1]);\n\t}\n catch(Exception obj)\n\t{\n\tcerr<<endl<<obj.get()<<endl;\n\t}\n\n";
     out << " time(&time_4);\n\n cout<<\"\\n\\nEND EXECUTION\"<<endl;\n cout<<\"\\nResults are saved in: \"<<argv[1]<<endl;\n";
     out << " cout<<\"\\n=========================== TIME ===========================\\n\\n\\t\";\n";
@@ -1109,7 +1121,7 @@ for (pp = 0; pp < npl; pp++)
     }
     //variability
     out << " std::string fbound=\"\", finit=\"\", fparm=\"\";\n";
-    out << " double hini = 1e-6, atolODE = 1e-6, rtolODE=1e-6, ftime=1.0, stime=0.0, itime=0.0, epsTAU=0.1;\n\n";
+    out << " double hini = 1e-6, atolODE = 1e-6, rtolODE=1e-6, ftime=1.0, stime=0.0, itime=0.0, epsTAU=0.1, delta=0.0;\n\n";
     out << " cout<<\"\\n\\n =========================================================\\n\";\n";
     out << " cout<<\"|                ODE/SDE Solver                       |\\n\";\n";
     out << " cout<<\" =========================================================\\n\";\n";
@@ -1129,7 +1141,7 @@ for (pp = 0; pp < npl; pp++)
     }
     //automaton
     out<<"std::cerr<<\"\\n\\n\\tOPTIONS\\n\";\n\t";
-    out << " std::cerr<<\"\\n\\t -type <type>:\\t\\t ODE-E or ODE-RKF or ODE45 or LSODA or HLSODA or (H)SDE or HODE or SSA or TAUG or STEP. Default: LSODA \";\n\t";
+    out << " std::cerr<<\"\\n\\t -type <type>:\\t\\t ODE-E or ODE-RKF or ODE45 or LSODA or HLSODA or (H)SDE or HODE or SSA or TAUG or STEP or BRANCH. Default: LSODA \";\n\t";
     out << " std::cerr<<\"\\n\\t -hini <double>:\\t Initial step size. Default: 1e-6\";\n\t";
     out << " std::cerr<<\"\\n\\t -atol <double>:\\t Absolute error tolerance. Dafault: 1e-6\";\n\t";
     out << " std::cerr<<\"\\n\\t -rtol <double>:\\t Relative error tolerance. Dafault: 1e-6\";\n\t";
@@ -1139,6 +1151,7 @@ for (pp = 0; pp < npl; pp++)
     out << " std::cerr<<\"\\n\\t -stime <double>:\\t Double number used to set the step in the output. Default: 0.0 (no output)\";\n\t";
     out << " std::cerr<<\"\\n\\t -itime <double>:\\t Double number used to set the initial simulation time. Default: 0.0 \";\n\t";
     out << " std::cerr<<\"\\n\\t -b <bound_file>:\\t Soft bound are defined in the file <bound_file>\";\n\t";
+    out << " std::cerr<<\"\\n\\t -branch <double>:\\t Delta used for the embedding simulation \";\n\t";
     out << " std::cerr<<\"\\n\\t -seed <double>:\\t Seed of random number generator\";\n\t";
     //variability 
     if (FLUXB){
@@ -1174,6 +1187,7 @@ for (pp = 0; pp < npl; pp++)
     out << "\t\t\t else if ((strcmp(argv[ii],\"HLSODA\")==0)||(strcmp(argv[ii],\"hlsoda\")==0)) SOLVE = 8;\n";
     out << "\t\t\t else if ((strcmp(argv[ii],\"SDE\")==0)||(strcmp(argv[ii],\"sde\")==0) || (strcmp(argv[ii],\"HSDE\")==0)||(strcmp(argv[ii],\"hsde\")==0) ) SOLVE = 0;\n";
     out << "\t\t\t else if ((strcmp(argv[ii],\"TAUG\")==0)||(strcmp(argv[ii],\"taug\")==0)) SOLVE = 9;\n";
+    out << "\t\t\t else if ((strcmp(argv[ii],\"BRANCH\")==0)||(strcmp(argv[ii],\"branch\")==0)) SOLVE = 10;\n";
     out<<"\t\t\t else{\n";
     out<< "\t\t\t\t std::cerr<<\"\\n\\tError:  -type  <value>\\n\\n\";\n\t\t\t exit(EXIT_FAILURE);\n\t\t }\n";
     out<<"\t\t }\n";
@@ -1292,6 +1306,16 @@ for (pp = 0; pp < npl; pp++)
     out<<"\t\t continue;\n";
     out<<"\t }\n";
 
+    //Delta for embedding simulation
+    out<<"\t if (strcmp(\"-delta\", argv[ii])==0){\n";
+    out<<"\t\t if (++ii<argc){\n";
+    out<<"\t\t\t delta=atof(argv[ii]);\n\t\t }\n";
+    out<<"\t\t else{\n";
+    out<< "\t\t\t std::cerr<<\"\\nError:  -delta  <value>\\n\";\n\t\t\t exit(EXIT_FAILURE);\n\t\t }\n";
+    out<<"\t\t continue;\n";
+    out<<"\t }\n";
+
+
     out<< "\t\t\t std::cerr<<\"\\nError:  unknown parameter \"<<argv[ii]<<\"\\n\\n\";\n\t\t\t exit(EXIT_FAILURE);\n";
     out<<" }\n\n\n";
 
@@ -1318,6 +1342,7 @@ for (pp = 0; pp < npl; pp++)
     out << " if (fbound!=\"\") cout<<\"\\tBound file: \"<<fbound<<\"\\n\";\n";
     out << " if (finit!=\"\") cout<<\"\\tInitial marking file: \"<<finit<<\"\\n\";\n";
     out << " if (fparm!=\"\") cout<<\"\\tInitial parameter file: \"<<fparm<<\"\\n\";\n";
+    out << " if (delta!=0) cout<<\"\\tDelta: \"<<delta<<\"\\n\";\n";
     //Variability
     if (FLUXB){
         out << " if (VARIABILITY) cout<<\"\\tEnable variability analysis.\\n\";\n";
@@ -1480,8 +1505,7 @@ for (pp = 0; pp < npl; pp++)
     out << "\n\tif (SOLVE==-1) \{\n\t\t cerr<< \"\\n\\nError: solution methods is not implemented\\nYou should use:  ODE-E or ODE-RKF or ODE45 or LSODA or SDE or HODE or HSDE or TAUG or SSA or STEP\\n\"; \n\t\t exit(EXIT_FAILURE);\n\t}\n\n ";
 
 
-
-    out << "\n\tif (SOLVE == 1)\n\t\t se.SolveODEEuler(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t else\n\t\t if (SOLVE == 0)\n\t\t\t se.SolveSDEEuler(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t else \n\t\t\tif (SOLVE == 3)\n\t\t\t\t se.SolveSSA(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]); \n\t\t\t else \n\t\t\t\t if (SOLVE == 4)\n\t\t\t\t\t  se.HeuristicStep(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 5)\n\t\t\t\t\t  se.SolveODERKF(hini,atolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\tif (SOLVE == 6)\n\t\t\t\t\t\t se.SolveODE45(hini,atolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 8)\n\t\t\t\t\t\t\t se.SolveHLSODE(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t\t\t\t else \n\t\t\t\t\t\t\t if (SOLVE == 7) \n\t\t\t\t\t\t\t\t se.SolveLSODE(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t\t\t\t else  \n\t\t\t\t\t\t\t\t se.SolveTAUG(ftime,runs,OUTPUT,stime,argv[1]);";
+    out << "\n\tif (SOLVE == 1)\n\t\t se.SolveODEEuler(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t else\n\t\t if (SOLVE == 0)\n\t\t\t se.SolveSDEEuler(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t else \n\t\t\tif (SOLVE == 3)\n\t\t\t\t se.SolveSSA(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]); \n\t\t\t else \n\t\t\t\t if (SOLVE == 4)\n\t\t\t\t\t  se.HeuristicStep(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 5)\n\t\t\t\t\t  se.SolveODERKF(hini,atolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\tif (SOLVE == 6)\n\t\t\t\t\t\t se.SolveODE45(hini,atolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 8)\n\t\t\t\t\t\t\t se.SolveHLSODE(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t\t\t\t else \n\t\t\t\t\t\t\t if (SOLVE == 7) \n\t\t\t\t\t\t\t\t se.SolveLSODE(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t\t\t\t else \n\t\t\t\t\t\t\t\t if (SOLVE == 10)  \n\t\t\t\t\t\t\t\t se.SolveBranchingMethod(ftime,runs,delta,OUTPUT,stime,argv[1]); \n\t\t\t\t\t\t\t else  \n\t\t\t\t\t\t\t\t se.SolveTAUG(ftime,runs,OUTPUT,stime,argv[1]);";
     out << "\n\tse.PrintStatistic(argv[1]);\n\t}\n catch(Exception obj)\n\t{\n\tcerr<<endl<<obj.get()<<endl;\n\t}\n\n";
     out << " time(&time_4);\n\n cout<<\"\\n\\nEND EXECUTION\"<<endl;\n cout<<\"\\nResults are saved in: \"<<argv[1]<<endl;\n";
     out << " cout<<\"\\n=========================== TIME ===========================\\n\\n\\t\";\n";

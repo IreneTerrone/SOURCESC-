@@ -3434,9 +3434,10 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
 	//double tout;
+ 
+	cout << " OMG ENTRI QUI? E IL DELTA? " << delta << endl;
 
 	//double ValuePrev[nPlaces] {0.0};
-
 
 	double ValueInit[nPlaces];
 
@@ -3444,11 +3445,9 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 	std::fill(firing, firing + nTrans, 0);
 	cout<<endl<<"Seed value: "<<seed;
 
-//NON RICORDO SE SUPPORTA LA FLUX
 	ofstream out;
-#ifdef CGLPK
-	vector <ofstream> outflux(vec_fluxb.size());	
-#endif
+
+
 	if (Info)
 	{
 		out.open(string(argv)+".trace",ofstream::out);
@@ -3457,26 +3456,10 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 			throw Exception("*****Error opening output file***\n\n");
 		}
 		out<<"Time";
-#ifdef CGLPK
-		for (unsigned int i=0;i<vec_fluxb.size();++i){
-			outflux[i].open(string(argv)+to_string(i)+".flux",ofstream::out);
-			outflux[i].precision(16);
-			if(!outflux[i]){
-				throw Exception("*****Error opening output file storing FLUXES*****\n\n");
-			}
-			outflux[i]<<"Time"<<" Obj_"<<i;
-		}	
-#endif		
+	
 		for(int i=0;i<nPlaces;i++)
 			out<<" "<<NamePlaces[i];	
-#ifdef CGLPK
-      	for (unsigned int i=0;i<vec_fluxb.size();++i){
-			vec_fluxb[i].printFluxName(outflux[i]);		
-			if (Variability){
-				vec_fluxb[i].printFluxNameMinMax(outflux[i]);	
-			}
-		}
-#endif		
+	
 //		out<<endl;
 	}
 
@@ -3523,17 +3506,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 			}
 		}
 		if(Info){
-#ifdef CGLPK
-		getValTranFire(Value);
-      	for (unsigned int i=0;i<vec_fluxb.size();++i){
-      		outflux[i]<<endl<<itime<<" ";
-      		vec_fluxb[i].printObject(outflux[i]);
-			vec_fluxb[i].printValue(outflux[i]);
-			if (Variability){
-				vec_fluxb[i].printLowerMax(outflux[i]);	
-			}
-		}
-#endif			
+		
 			out<<endl;;
 		}
 
@@ -3541,17 +3514,14 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 		//istate=1;
 		double t=MAX_DOUBLE,tmpt=itime;
 
-		bool neg=false;
 		DerivTAUG = new double[nPlaces];
 
 		while(nextTimePoint<=Max_Time){
 
-			if(!neg){
                 time=nextTimePoint;
 				getValTranFire();
-			}
+			
 
-			neg=false;
 
 		//compute tau
 
@@ -3572,6 +3542,8 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 			}
 
 
+			//IL DELTA E' PASSATO COME PARAMETRO E DEVO FARE LA MULTINOMIALE CON IL VETTORE DI DOUBLE E LA
+			//LUNGHEZZA DEL VETTORE DI DOUBLE
 
 
 			for (int i=0;i<nTrans;i++){//oggi i=1 old
@@ -3594,7 +3566,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 			//cout<<endl;
 
 			unsigned int i = headDirc;
-			while(i!=DEFAULT && !neg)
+			while(i!=DEFAULT)
 			{
 				double tmpvalSIM=0.0;
 				for(int j=0; j<VEq[i].getSize();j++)//for all components
@@ -3609,26 +3581,15 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 					}
 
 				}//for all components
-				if (ValuePrv[i]+tmpvalSIM<0){
-					neg=true;
-				}
-				else{
+
+	
 				Value[i]=ValuePrv[i]+tmpvalSIM;
 				i=VEq[i].getNext();
 
 
-				}
-
 
 			}
-			if (!neg)
-                derived(neg);//it derives all the rest of places
-			if(neg){
-				t=tau=tau/2;
-				nextTimePoint=tmpt;
-			}
-			else
-			{
+                derived();//it derives all the rest of places
                 t=MAX_DOUBLE;
 				for(int j=0;j<=nPlaces;j++){
 					ValuePrv[j]=Value[j];
@@ -3657,8 +3618,6 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 					tout+=Print_Step;
 				}
 				tmpt=nextTimePoint;
-
-			}
 
 		}
 
