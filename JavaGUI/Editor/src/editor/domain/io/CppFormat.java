@@ -19,7 +19,7 @@ import java.util.StringJoiner;
  */
 public class CppFormat {
 
-    public static void export(File file, GspnPage gspn, boolean fluxBalance, ParserContext context, Set<String> filenames)
+    public static void export(File file, GspnPage gspn, boolean fluxBalance, boolean branchFlag, ParserContext context, Set<String> filenames)
             throws Exception {
 
         try (PrintWriter out = new PrintWriter(new BufferedOutputStream(new FileOutputStream(file)))) {
@@ -60,6 +60,17 @@ public class CppFormat {
                                     + "                         const int T,\n"
                                     + "                         const double& time) {\n");
 
+                        } else if(branchFlag) {
+                             
+                            out.println("vector<double> " + trn.getUniqueName() + "_general(double *Value,\n"
+                                    + "                         map <string,int>& NumTrans,\n"
+                                    + "                         map <string,int>& NumPlaces,\n"
+                                    + "                         const vector<string> & NameTrans,\n"
+                                    + "                         const struct InfTr* Trans,\n"
+                                    + "                         const int T,\n"
+                                    + "                         const double& time) {\n");
+                            
+                            
                         } else {
 
                             out.println("double " + trn.getUniqueName() + "_general(double *Value,\n"

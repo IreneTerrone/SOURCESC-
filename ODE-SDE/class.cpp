@@ -3297,6 +3297,250 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 		//istate=1;
 		double t=MAX_DOUBLE,tmpt=itime;
 
+		DerivTAUG = new double[nPlaces];
+
+		while(nextTimePoint<=Max_Time){
+
+
+            time=nextTimePoint;
+			getValTranFire();
+
+
+		//compute DELTA questo sarà fisso
+
+			double tau=getComputeTauGillespie(SetTran,t, hstep);
+
+			nextTimePoint+=tau;
+			if (nextTimePoint>tout){
+                tau=tout-tmpt;
+                nextTimePoint=tout;
+			}
+
+			//cout<<"Tau: "<< tau<<endl;
+			//cout<<"TIME:"<<nextTimePoint<<endl;
+
+			if(tau==-1){
+				throw Exception("*****Error during the tau computation*****\n\n");
+
+			}
+
+
+
+
+			for (int i=0;i<nTrans;i++){//oggi i=1 old
+				//oggi if(EnabledTransValueDis[i]!=0){
+				if(EnabledTransValueDis[i]!=0){
+					//oggi std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
+					 if (Trans[i].GenFun==""){
+					 	//QUI sarà da calcolare il p per le transizioni che non ricordo brava meh
+                          std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
+                          firing[i]=PoisD(generator);
+                          }
+                     else{
+                          std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]);
+                          firing[i]=PoisD(generator);//oggi
+                          }
+				}
+				else
+					firing[i]=0;//oggi
+			//cout<<"Firing: "<<firing[i];
+			}
+			//cout<<endl;
+
+			unsigned int i = headDirc;
+			while(i!=DEFAULT)
+			{
+				double tmpvalSIM=0.0;
+				for(int j=0; j<VEq[i].getSize();j++)//for all components
+				{
+					//if(!NotEnable(VEq[i].getIdTrans(j)))
+					//{
+					//	tmpvalSIM+=VEq[i].getIncDec(j)*firing[VEq[i].getIdTrans(j)];
+					//}
+					if(firing[VEq[i].getIdTrans(j)]!=0)
+					{
+						tmpvalSIM+=VEq[i].getIncDec(j)*firing[VEq[i].getIdTrans(j)];
+					}
+
+				}//for all components
+				/* questo non dovrebbe servire perché il valore non può andare sottozero
+				if (ValuePrv[i]+tmpvalSIM<0){
+					neg=true;
+				}
+				else{*/
+				Value[i]=ValuePrv[i]+tmpvalSIM;
+				i=VEq[i].getNext();
+
+
+				//}
+
+
+			}
+                t=MAX_DOUBLE;
+				for(int j=0;j<=nPlaces;j++){
+					ValuePrv[j]=Value[j];
+				}
+				//tmpt=t;
+				if(tout==nextTimePoint){
+					if(Info){
+
+					out<<endl<<nextTimePoint;
+					for(int j=0; j<nPlaces;j++){
+
+						out<<" "<<Value[j];
+						}
+#ifdef CGLPK
+        			for (unsigned int i=0;i<vec_fluxb.size();++i){
+        				outflux[i]<<endl<<tout<<" ";
+        				vec_fluxb[i].printObject(outflux[i]);
+						vec_fluxb[i].printValue(outflux[i]);
+						if (Variability){
+							vec_fluxb[i].printLowerMax(outflux[i]);	
+						}
+					}
+#endif						
+//					out<<endl;
+					}
+					tout+=Print_Step;
+				}
+				tmpt=nextTimePoint;
+
+
+		}
+
+	for (int i=0;i<nPlaces;i++)
+	{
+		Mean[i]+=FinalValueXRun[i][run]=Value[i];
+	}
+
+	++run;
+
+	}
+}
+
+
+
+
+
+/**************************************************************/
+/* NAME :  Class SystEq*/
+/* DESCRIPTION : It solves the ODE system using the branching method*/
+/**************************************************************/
+void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Info,double Print_Step,char *argv){
+
+
+	this-> Max_Run=Max_Run;
+	FinalValueXRun = new double*[nPlaces];
+	double Mean[nPlaces];
+	std::fill(Mean, Mean + nPlaces, 0.0);
+	//double tout;
+
+	//double ValuePrev[nPlaces] {0.0};
+
+
+	double ValueInit[nPlaces];
+
+	int firing[nTrans];
+	std::fill(firing, firing + nTrans, 0);
+	cout<<endl<<"Seed value: "<<seed;
+
+//NON RICORDO SE SUPPORTA LA FLUX
+	ofstream out;
+#ifdef CGLPK
+	vector <ofstream> outflux(vec_fluxb.size());	
+#endif
+	if (Info)
+	{
+		out.open(string(argv)+".trace",ofstream::out);
+		out.precision(16);
+		if(!out){
+			throw Exception("*****Error opening output file***\n\n");
+		}
+		out<<"Time";
+#ifdef CGLPK
+		for (unsigned int i=0;i<vec_fluxb.size();++i){
+			outflux[i].open(string(argv)+to_string(i)+".flux",ofstream::out);
+			outflux[i].precision(16);
+			if(!outflux[i]){
+				throw Exception("*****Error opening output file storing FLUXES*****\n\n");
+			}
+			outflux[i]<<"Time"<<" Obj_"<<i;
+		}	
+#endif		
+		for(int i=0;i<nPlaces;i++)
+			out<<" "<<NamePlaces[i];	
+#ifdef CGLPK
+      	for (unsigned int i=0;i<vec_fluxb.size();++i){
+			vec_fluxb[i].printFluxName(outflux[i]);		
+			if (Variability){
+				vec_fluxb[i].printFluxNameMinMax(outflux[i]);	
+			}
+		}
+#endif		
+//		out<<endl;
+	}
+
+	cout.precision(16);
+	for(int i=0;i<nPlaces;i++)
+	{
+		FinalValueXRun[i]=new double[Max_Run+1];
+		for(int j=0;j<Max_Run+1;j++)
+			FinalValueXRun[i][j]=0.0;
+		ValueInit[i]=Value[i];
+	}
+
+
+	int SetTran[nTrans+1];
+	std::fill(SetTran, SetTran + nTrans + 1, 0);
+	//disable discrete transition from fluid computation
+	for(int i=0;i<nTrans;i++)
+	{
+	//All transitions
+	//if (Trans[i].discrete){
+		SetTran[++SetTran[0]]=i;
+		Trans[i].enable=false;
+		//}
+	}
+
+	int run=0;
+	double hstep = 0.00001;
+
+	while (run<Max_Run){
+
+	if(run%100==0){
+		cout<<"\r\t START RUN..."<<run<<" ";
+		cout.flush();
+	}
+		//Initialization for each run
+		if(Info){
+			out<<endl<<itime;
+		}
+
+		for (int j=0;j<nPlaces;j++){
+			ValuePrv[j]=ValueInit[j];
+			if(Info){
+				out<<" "<<ValuePrv[j];
+			}
+		}
+		if(Info){
+#ifdef CGLPK
+		getValTranFire(Value);
+      	for (unsigned int i=0;i<vec_fluxb.size();++i){
+      		outflux[i]<<endl<<itime<<" ";
+      		vec_fluxb[i].printObject(outflux[i]);
+			vec_fluxb[i].printValue(outflux[i]);
+			if (Variability){
+				vec_fluxb[i].printLowerMax(outflux[i]);	
+			}
+		}
+#endif			
+			out<<endl;;
+		}
+
+		double nextTimePoint=itime,tout=Print_Step+itime;
+		//istate=1;
+		double t=MAX_DOUBLE,tmpt=itime;
+
 		bool neg=false;
 		DerivTAUG = new double[nPlaces];
 
@@ -3427,6 +3671,8 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 
 	}
 }
+
+
 
 
 

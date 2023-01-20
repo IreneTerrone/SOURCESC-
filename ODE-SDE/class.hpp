@@ -499,6 +499,8 @@ public:
   void SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max_Run,bool Info,double Print_Step,char *argv);
      //! It solves the ODE system using  tau-leaping method  method. It returns the computed tau.
   void SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,char *argv);
+  //! It solves the system using embedding simulation
+  void SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Info,double Print_Step,char *argv);
     //! It computes the sixth-order approximation of the derivative according to the Richardson's Extrapolation formula.
   double DerivApproximation(double *ValuePrv, map <string,int>& NumTrans, map <string,int>& NumPlaces,const vector<string> & NameTrans, const struct InfTr* Trans, const int T, const double& time, double hstep, int ider);
     //! They need for the sixth-order approximation of the derivative according to the Richardson's Extrapolation formula.

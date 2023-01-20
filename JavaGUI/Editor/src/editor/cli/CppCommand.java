@@ -60,11 +60,15 @@ public class CppCommand {
         
         // Parse the remaining arguments
         boolean fluxBalanceFlag = false;
+        boolean branchFlag = false;
         for (int i=2; i<args.length; i++) {
             if (args[i].equals("-flux")) {
-                // DO something
                 fluxBalanceFlag = true;
                 System.out.println("Enabling flux balance.");
+            }
+            if(args[i].equals("-branching")){
+              branchFlag = true;
+              System.out.println("Enabling embedding simulation.");
             }
             else {
                 System.err.println("Unknown argument: "+args[i]);
@@ -95,7 +99,7 @@ public class CppCommand {
 
         long saveStart = System.currentTimeMillis();
          // Convert in C++
-        CppFormat.export(cppFile, gspn, fluxBalanceFlag, context, etv.filenames);
+        CppFormat.export(cppFile, gspn, fluxBalanceFlag, branchFlag, context, etv.filenames);
 
         System.out.println("SAVING TIME: " + (System.currentTimeMillis() - saveStart) / 1000.0);
         return true;
