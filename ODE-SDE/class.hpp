@@ -104,7 +104,6 @@
 //automaton
 #ifdef AUTOMATON
   #include "automa.hpp"
- // #include <boost/math/distributions/binomial.hpp>
 #endif
 //automaton
 
@@ -127,6 +126,14 @@
 #ifndef __LSD_H__
 #define __LSD_H__
 #include "lsode.hpp"
+#endif
+
+#ifdef EMBEDDING
+  #ifndef __GSL__
+    #define __GSL__
+    #include <gsl/gsl_randist.h>
+    #include <gsl/gsl_rng.h>
+  #endif
 #endif
 
 
@@ -397,6 +404,8 @@ namespace SDE
   void derived(bool&);
     //!From a place name it provides its position in NamePlaces.
   int search(string& name);
+    //!It returns the A and B for branching modeling
+  vector<double> getP(double A, double B, double delta);
     //Max number of attempt used in RK
   int max_attempt {500};
     //!It stores the used seed

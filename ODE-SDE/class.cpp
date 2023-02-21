@@ -126,24 +126,24 @@ bool SystEq::readInitialMarking(const string& file){
 	double buffer=-1;
 	int num=0;
 
-    while(in){
-        buffer=-1;
-        in>>buffer;
-        if (buffer>=0.0){
-            Value[num]=buffer;
+	while(in){
+		buffer=-1;
+		in>>buffer;
+		if (buffer>=0.0){
+			Value[num]=buffer;
 #if DEBUG==1
-            cout<<"Place "<<num<<" marking:"<<buffer<<endl;
+			cout<<"Place "<<num<<" marking:"<<buffer<<endl;
 #endif
-            num++;
-        }
+			num++;
+		}
 
-    }
-    if ((num)!=nPlaces){
-            cerr<<"\nError:  initial marking file does not cointain a marking for each place\n\n";
-            return false;
-        }
+	}
+	if ((num)!=nPlaces){
+		cerr<<"\nError:  initial marking file does not cointain a marking for each place\n\n";
+		return false;
+	}
 //updating p-semiflow
-    unsigned int i=headDerv;
+	unsigned int i=headDerv;
 	while (i!=DEFAULT){
 		double value =0.0, coff=0.0;
 		int place=-1;
@@ -152,8 +152,8 @@ bool SystEq::readInitialMarking(const string& file){
 			value+=Value[place]*coff;
 		}
 		value+=Value[i];
-        VEq[i].setPsemflw(VEq[i].getSizeP()-1,value);
-        i=VEq[i].getNext();
+		VEq[i].setPsemflw(VEq[i].getSizeP()-1,value);
+		i=VEq[i].getNext();
 	}
 	cout<<"-----------------------------------------------------------\n";
 	return true;
@@ -185,38 +185,38 @@ bool SystEq::readParameter(const string& file){
 
 
 	try{
-        string name="";
-        double value=0.0;
-        while(!in.eof()){
+		string name="";
+		double value=0.0;
+		while(!in.eof()){
 
-            in>>name>>value;
-            if ((name!="")&& (value!=-1)){
-                map<std::string,int>::iterator it;
-                if ((it=NumTrans.find(name))!=NumTrans.end()){
-                    cout<<"New rate of transition "<<name<<" is "<<value<<endl;
-                    Trans[it->second].rate=value;
-                    }
-                else{
-                    if ((it=NumPlaces.find(name))!=NumPlaces.end()){
-                        cout<<"New marking of place "<<name<<" is "<<value<<endl;
-                        Value[it->second]=value;
-                        }
-                    else{
-                        cout<<"Warning: "<<name<<" is not a valid  transition or place name"<<endl;
-                        }
-                    }
-                name="";
-                value=-1.0;
-                }
-        }
+			in>>name>>value;
+			if ((name!="")&& (value!=-1)){
+				map<std::string,int>::iterator it;
+				if ((it=NumTrans.find(name))!=NumTrans.end()){
+					cout<<"New rate of transition "<<name<<" is "<<value<<endl;
+					Trans[it->second].rate=value;
+				}
+				else{
+					if ((it=NumPlaces.find(name))!=NumPlaces.end()){
+						cout<<"New marking of place "<<name<<" is "<<value<<endl;
+						Value[it->second]=value;
+					}
+					else{
+						cout<<"Warning: "<<name<<" is not a valid  transition or place name"<<endl;
+					}
+				}
+				name="";
+				value=-1.0;
+			}
+		}
 
 	}catch (exception& e){
-        cout << "Exception: " << e.what() << endl;
-        return false;
-    }
+		cout << "Exception: " << e.what() << endl;
+		return false;
+	}
 
     //updating p-semiflow
-    unsigned int i=headDerv;
+	unsigned int i=headDerv;
 	while (i!=DEFAULT){
 		double value =0.0, coff=0.0;
 		int place=-1;
@@ -225,8 +225,8 @@ bool SystEq::readParameter(const string& file){
 			value+=Value[place]*coff;
 		}
 		value+=Value[i];
-        VEq[i].setPsemflw(VEq[i].getSizeP()-1,value);
-        i=VEq[i].getNext();
+		VEq[i].setPsemflw(VEq[i].getSizeP()-1,value);
+		i=VEq[i].getNext();
 	}
 	cout<<"-----------------------------------------------------------\n";
 	return true;
@@ -257,9 +257,9 @@ inline void SystEqMin::getValTranFire()
 		if (Trans[t].FuncT!=nullptr){
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
-       		EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #else
-   			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #endif 
 		}
 		else {
@@ -309,9 +309,9 @@ inline void SystEqMas::getValTranFire()
 		if (Trans[t].FuncT!=nullptr){
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
-			 EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #else
-   			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #endif 		
 
 		}
@@ -354,45 +354,45 @@ inline void SystEqMas::getValTranFire()
                      considering its input vector ValuePrv as marking*/
 /**************************************************************/
 
-    inline void SystEqMas::getValTranFire(double* ValuePrv)
-    {
-        for(int t=0; t<nTrans; t++)
-        {
-            EnabledTransValueDis[t]=EnabledTransValueCon[t]=1.0;
+inline void SystEqMas::getValTranFire(double* ValuePrv)
+{
+	for(int t=0; t<nTrans; t++)
+	{
+		EnabledTransValueDis[t]=EnabledTransValueCon[t]=1.0;
               //cout<<" T:"<<NameTrans[t]<<endl;
-            if (Trans[t].FuncT!=nullptr)
-            {
+		if (Trans[t].FuncT!=nullptr)
+		{
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
-				EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #else
-   				EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #endif 	
-            }
-            else
-            {
+		}
+		else
+		{
 
-                if (Trans[t].InPlaces.size()>0)
-                {
+			if (Trans[t].InPlaces.size()>0)
+			{
                     for (unsigned int k=0; k<Trans[t].InPlaces.size(); k++)//for all variables in the components
                     {
-                        double valD,valC;
-                        valD=valC=ValuePrv[Trans[t].InPlaces[k].Id];
+                    	double valD,valC;
+                    	valD=valC=ValuePrv[Trans[t].InPlaces[k].Id];
                       //  cout<<"\t"<<NamePlaces[Trans[t].InPlaces[k].Id]<<" card:"<<Trans[t].InPlaces[k].Card<<" num:"<<ValuePrv[Trans[t].InPlaces[k].Id]<<endl;
-                        double fatt=1;
-                        for (int i=2; i<=Trans[t].InPlaces[k].Card; i++)
-                        {
-                            valD*=(ValuePrv[Trans[t].InPlaces[k].Id]-i+1);
-                            valC*=ValuePrv[Trans[t].InPlaces[k].Id];
-                            fatt*=(double)i;
+                    	double fatt=1;
+                    	for (int i=2; i<=Trans[t].InPlaces[k].Card; i++)
+                    	{
+                    		valD*=(ValuePrv[Trans[t].InPlaces[k].Id]-i+1);
+                    		valC*=ValuePrv[Trans[t].InPlaces[k].Id];
+                    		fatt*=(double)i;
 
-                        }
+                    	}
 
-                        if (valD>0)
-                            EnabledTransValueDis[t]*=valD/fatt;
-                        else
-                            EnabledTransValueDis[t]=0.0;
-                        EnabledTransValueCon[t]*=valC/fatt;
+                    	if (valD>0)
+                    		EnabledTransValueDis[t]*=valD/fatt;
+                    	else
+                    		EnabledTransValueDis[t]=0.0;
+                    	EnabledTransValueCon[t]*=valC/fatt;
                        // cout<<"\t"<<valC/fatt<<" Tot:"<<EnabledTransValueCon[t]<<endl;
                     }
                 }
@@ -411,42 +411,42 @@ inline void SystEqMas::getValTranFire()
     inline void SystEqMin::getValTranFire(double* ValuePrv)
     {
 
-        for(int t=0; t<nTrans; t++)
-        {
-            unsigned int size=Trans[t].InPlaces.size();
-            EnabledTransValueCon[t]=0.0;
-            EnabledTransValueDis[t]=0.0;
-            if (Trans[t].FuncT!=nullptr)
-            {
+    	for(int t=0; t<nTrans; t++)
+    	{
+    		unsigned int size=Trans[t].InPlaces.size();
+    		EnabledTransValueCon[t]=0.0;
+    		EnabledTransValueDis[t]=0.0;
+    		if (Trans[t].FuncT!=nullptr)
+    		{
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
-				EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+    			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #else
-   				EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+    			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #endif 	
-            }
-            else
-            {
-                if (size==0)
-                    EnabledTransValueDis[t]=EnabledTransValueCon[t]=1.0;
-                else
-                {
-                    double tmpC;
-                    double tmpD;
+    		}
+    		else
+    		{
+    			if (size==0)
+    				EnabledTransValueDis[t]=EnabledTransValueCon[t]=1.0;
+    			else
+    			{
+    				double tmpC;
+    				double tmpD;
                     //if (Trans[t].InPlaces.size()>0)
                     //{
-                    EnabledTransValueCon[t] =ValuePrv[Trans[t].InPlaces[0].Id]/Trans[t].InPlaces[0].Card;
-                    EnabledTransValueDis[t] =trunc(EnabledTransValueCon[t]);
+    				EnabledTransValueCon[t] =ValuePrv[Trans[t].InPlaces[0].Id]/Trans[t].InPlaces[0].Card;
+    				EnabledTransValueDis[t] =trunc(EnabledTransValueCon[t]);
                     for (unsigned int k=1; k<size&&(EnabledTransValueCon[t]!=0.0); k++)//for all variable in the components
                     {
-                        tmpC=ValuePrv[Trans[t].InPlaces[k].Id]/Trans[t].InPlaces[k].Card;
-                        tmpD=trunc(tmpC);
-                        if ( EnabledTransValueCon[t]>tmpC)
-                        {
-                            EnabledTransValueCon[t]=tmpC;
-                            EnabledTransValueDis[t]=tmpD;
+                    	tmpC=ValuePrv[Trans[t].InPlaces[k].Id]/Trans[t].InPlaces[k].Card;
+                    	tmpD=trunc(tmpC);
+                    	if ( EnabledTransValueCon[t]>tmpC)
+                    	{
+                    		EnabledTransValueCon[t]=tmpC;
+                    		EnabledTransValueDis[t]=tmpD;
 
-                        }
+                    	}
 
                     }
 
@@ -463,101 +463,101 @@ inline void SystEqMas::getValTranFire()
 /* DESCRIPTION : Constructor taking in input  the total number of transitions and places, and two vector with the names of places and transitions */
 /**************************************************************/
 
-SystEq::SystEq(int nPlaces,int nTrans, string NamePlaces[],  string NameTrans[], double itime, long int seed){
+    SystEq::SystEq(int nPlaces,int nTrans, string NamePlaces[],  string NameTrans[], double itime, long int seed){
 
-	this->nTrans=nTrans;
-	this->nPlaces=nPlaces;
+    	this->nTrans=nTrans;
+    	this->nPlaces=nPlaces;
 
-	Trans=new struct InfTr[nTrans];
-	VEq=new class Equation[nPlaces];
-	Value=(double*)malloc(sizeof(double)*nPlaces);
-	ValuePrv=(double*)malloc(sizeof(double)*nPlaces);
-	LBound=(double*)malloc(sizeof(double)*nPlaces);
-	UBound=(double*)malloc(sizeof(double)*nPlaces);
-	SLBound=(double*)malloc(sizeof(double)*nPlaces);
-	SUBound=(double*)malloc(sizeof(double)*nPlaces);
-	EnabledTransValueCon=(double*)malloc(sizeof(double)*nTrans);
-	EnabledTransValueDis=(double*)malloc(sizeof(double)*nTrans);
-	TransRate=(double*)malloc(sizeof(double)*(nTrans+1));
+    	Trans=new struct InfTr[nTrans];
+    	VEq=new class Equation[nPlaces];
+    	Value=(double*)malloc(sizeof(double)*nPlaces);
+    	ValuePrv=(double*)malloc(sizeof(double)*nPlaces);
+    	LBound=(double*)malloc(sizeof(double)*nPlaces);
+    	UBound=(double*)malloc(sizeof(double)*nPlaces);
+    	SLBound=(double*)malloc(sizeof(double)*nPlaces);
+    	SUBound=(double*)malloc(sizeof(double)*nPlaces);
+    	EnabledTransValueCon=(double*)malloc(sizeof(double)*nTrans);
+    	EnabledTransValueDis=(double*)malloc(sizeof(double)*nTrans);
+    	TransRate=(double*)malloc(sizeof(double)*(nTrans+1));
 
-	time=this->itime=itime;
-	int i=0;
-	while(i<nTrans)
-	{
-		this->NameTrans.push_back(NameTrans[i]);
-		this->NumTrans[NameTrans[i]]=i;
-		++i;
-	}
-	i=0;
-	while(i<nPlaces)
-	{
-		this->NamePlaces.push_back(NamePlaces[i]);
-		this->NumPlaces[NamePlaces[i]]=i;
-		SLBound[i]=epsilon;
-		SUBound[i]=INT_MAX;
-		++i;
-	}
-	headDirc=headDerv=DEFAULT;
-	if (seed==0L)
-        this->seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    else
-        this->seed=seed;
+    	time=this->itime=itime;
+    	int i=0;
+    	while(i<nTrans)
+    	{
+    		this->NameTrans.push_back(NameTrans[i]);
+    		this->NumTrans[NameTrans[i]]=i;
+    		++i;
+    	}
+    	i=0;
+    	while(i<nPlaces)
+    	{
+    		this->NamePlaces.push_back(NamePlaces[i]);
+    		this->NumPlaces[NamePlaces[i]]=i;
+    		SLBound[i]=epsilon;
+    		SUBound[i]=INT_MAX;
+    		++i;
+    	}
+    	headDirc=headDerv=DEFAULT;
+    	if (seed==0L)
+    		this->seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    	else
+    		this->seed=seed;
 
-    generator.seed(this->seed);
-    distribution.param(std::normal_distribution<double>::param_type(0.0, 1.0));
+    	generator.seed(this->seed);
+    	distribution.param(std::normal_distribution<double>::param_type(0.0, 1.0));
     //distribution=&std::normal_distribution<double> (0.0,1.0);
    // =std::mt19937_64 generator(seed);
-}
+    }
 
 /**************************************************************/
 /* NAME :  Class SystEq*/
 /* DESCRIPTION : Deconstruct*/
 /**************************************************************/
 
-SystEq::~SystEq(){
+    SystEq::~SystEq(){
 
 
-	delete[] Trans;
-	delete[] VEq;
-	free(LBound);
-	free(UBound);
-	free(SLBound);
-	free(SUBound);
-	free(Value);
-	free(ValuePrv);
-	free(EnabledTransValueCon);
-	free(EnabledTransValueDis);
-	free(TransRate);
-	if (FinalValueXRun!=nullptr)
-	{
-		for(int i=0;i<nPlaces;i++)
-			delete[] FinalValueXRun[i];
-		delete[] FinalValueXRun;
-	}
+    	delete[] Trans;
+    	delete[] VEq;
+    	free(LBound);
+    	free(UBound);
+    	free(SLBound);
+    	free(SUBound);
+    	free(Value);
+    	free(ValuePrv);
+    	free(EnabledTransValueCon);
+    	free(EnabledTransValueDis);
+    	free(TransRate);
+    	if (FinalValueXRun!=nullptr)
+    	{
+    		for(int i=0;i<nPlaces;i++)
+    			delete[] FinalValueXRun[i];
+    		delete[] FinalValueXRun;
+    	}
 
-}
+    }
 
 /**************************************************************/
 /* NAME :  Class SystEq*/
 /* DESCRIPTION : It checks if it is disable by an inhibitor arc or due to the probabilistic step*/
 /**************************************************************/
 
-inline bool SystEq::NotEnable(int Tran){
+    inline bool SystEq::NotEnable(int Tran){
 
-	if (!Trans[Tran].enable) return true;
+    	if (!Trans[Tran].enable) return true;
 
-	if (Trans[Tran].InhPlaces.size()==0) return false;
-	vector <InfPlace>::iterator it= Trans[Tran].InhPlaces.begin();
-	while (it!=Trans[Tran].InhPlaces.end())
-	{
-		if (ValuePrv[it->Id]>=it->Card)
-		{
-			return true;
-		}
-		++it;
-	}
-	return false;
-}
+    	if (Trans[Tran].InhPlaces.size()==0) return false;
+    	vector <InfPlace>::iterator it= Trans[Tran].InhPlaces.begin();
+    	while (it!=Trans[Tran].InhPlaces.end())
+    	{
+    		if (ValuePrv[it->Id]>=it->Card)
+    		{
+    			return true;
+    		}
+    		++it;
+    	}
+    	return false;
+    }
 
 
 
@@ -567,12 +567,12 @@ inline bool SystEq::NotEnable(int Tran){
 /* NAME :  Class SystEq*/
 /* DESCRIPTION : resetTrans resets the set of enable transitions*/
 /**************************************************************/
-inline void  SystEq::resetTrans(){
+    inline void  SystEq::resetTrans(){
 
-	for (int i=0;i<nTrans;i++)
-		Trans[i].enable=true;
+    	for (int i=0;i<nTrans;i++)
+    		Trans[i].enable=true;
 
-}
+    }
 
 
 /**************************************************************/
@@ -580,35 +580,35 @@ inline void  SystEq::resetTrans(){
 /* DESCRIPTION : fireEnalbeTrans decides if one among the enable transitions can fire*/
 /**************************************************************/
 
-int SystEq::fireEnableTrans(int SetTran[],double& h ){
+    int SystEq::fireEnableTrans(int SetTran[],double& h ){
 
 
-	if (SetTran[0]!=0)
-	{
-		int size= SetTran[0];
-		double fireTime;
+    	if (SetTran[0]!=0)
+    	{
+    		int size= SetTran[0];
+    		double fireTime;
 
-		double minfireTime;
-		minfireTime= Trans[SetTran[1]].dist[0](generator)/EnabledTransValueDis[SetTran[1]];
-		int minTr=SetTran[1];
-		for (int i=2;i<=size;++i){
-			fireTime=Trans[SetTran[i]].dist[0](generator)/EnabledTransValueDis[SetTran[i]];
-			if (fireTime<minfireTime)
-			{
-				minfireTime=fireTime;
-				minTr=(SetTran[i]);
-			}
-		}
+    		double minfireTime;
+    		minfireTime= Trans[SetTran[1]].dist[0](generator)/EnabledTransValueDis[SetTran[1]];
+    		int minTr=SetTran[1];
+    		for (int i=2;i<=size;++i){
+    			fireTime=Trans[SetTran[i]].dist[0](generator)/EnabledTransValueDis[SetTran[i]];
+    			if (fireTime<minfireTime)
+    			{
+    				minfireTime=fireTime;
+    				minTr=(SetTran[i]);
+    			}
+    		}
 		//the selected transition will fire in the current time step
-		if  (minfireTime<h)
-		{
-			h=minfireTime;
-			Trans[minTr].enable=true;
-			return minTr;
-		}
-	}
-	return -1;
-}
+    		if  (minfireTime<h)
+    		{
+    			h=minfireTime;
+    			Trans[minTr].enable=true;
+    			return minTr;
+    		}
+    	}
+    	return -1;
+    }
 /*
  * int SystEq::fireEnableTrans(set<int>&SetTran,double& h ){
  *
@@ -647,45 +647,45 @@ return -1;
 /* NAME :  Class SystEq*/
 /* DESCRIPTION : setBNoiseTrans generates the brown noise value for all the transition involved  the diffusion process*/
 /**************************************************************/
-inline void  SystEq::setBNoiseTrans(int diffh){
+    inline void  SystEq::setBNoiseTrans(int diffh){
 
 
-	for (int i=0;i<nTrans;i++)
-	{
-		Trans[i].BrownNoise=0.0;
-	}
+    	for (int i=0;i<nTrans;i++)
+    	{
+    		Trans[i].BrownNoise=0.0;
+    	}
 
-	for (int j=0;j<diffh;j++)
-	{
-		for (int i=0;i<nTrans;i++)
-		{
-			Trans[i].BrownNoise+=distribution(generator);
-		}
-	}
-	for (int i=0;i<nTrans;i++)
-	{
-		Trans[i].BrownNoise= sqrt(Trans[i].rate*EnabledTransValueCon[i])*Trans[i].BrownNoise/sqrt(diffh);
-	}
-}
+    	for (int j=0;j<diffh;j++)
+    	{
+    		for (int i=0;i<nTrans;i++)
+    		{
+    			Trans[i].BrownNoise+=distribution(generator);
+    		}
+    	}
+    	for (int i=0;i<nTrans;i++)
+    	{
+    		Trans[i].BrownNoise= sqrt(Trans[i].rate*EnabledTransValueCon[i])*Trans[i].BrownNoise/sqrt(diffh);
+    	}
+    }
 
 
 /**************************************************************/
 /* NAME :  Class SystEq*/
 /* DESCRIPTION : setBNoiseTrans generates the brown noise value for all the transition involved  the diffusion process*/
 /**************************************************************/
-inline bool  SystEq::setBNoiseTrans(){
-	bool enalbleTransitionInDiffusion=false;
+    inline bool  SystEq::setBNoiseTrans(){
+    	bool enalbleTransitionInDiffusion=false;
 
-	for (int i=0;i<nTrans;i++)
-	{
-		if ((Trans[i].enable)&&(EnabledTransValueCon[i]!=0.0)){
-			double inc=Trans[i].rate*EnabledTransValueCon[i];
-			Trans[i].BrownNoise=sqrt(inc)*distribution(generator);
-			enalbleTransitionInDiffusion=true;
-		}
-	}
-	return enalbleTransitionInDiffusion;
-}
+    	for (int i=0;i<nTrans;i++)
+    	{
+    		if ((Trans[i].enable)&&(EnabledTransValueCon[i]!=0.0)){
+    			double inc=Trans[i].rate*EnabledTransValueCon[i];
+    			Trans[i].BrownNoise=sqrt(inc)*distribution(generator);
+    			enalbleTransitionInDiffusion=true;
+    		}
+    	}
+    	return enalbleTransitionInDiffusion;
+    }
 
 
 /**************************************************************/
@@ -693,28 +693,28 @@ inline bool  SystEq::setBNoiseTrans(){
 /* DESCRIPTION : ComputeODEstep computes the Euler step for ODE*/
 /**************************************************************/
 
-inline void SystEq::ComputeHstep(double& h){
-	double max_drift=0.0;
+    inline void SystEq::ComputeHstep(double& h){
+    	double max_drift=0.0;
 	//*int id_t=-1;
-	for (int i=0;i<nTrans;i++){
-		if ((Trans[i].enable)&&(EnabledTransValueCon[i]!=0.0)){
-			if (max_drift<Trans[i].rate)
-				max_drift=Trans[i].rate;
-		}
-	}
-	if (slow){
-		max_drift=1/(max_drift*32);
-	}
-	else
-		max_drift=1/(max_drift*16);
-	while (h>=max_drift){
-		h=h/2;
+    	for (int i=0;i<nTrans;i++){
+    		if ((Trans[i].enable)&&(EnabledTransValueCon[i]!=0.0)){
+    			if (max_drift<Trans[i].rate)
+    				max_drift=Trans[i].rate;
+    		}
+    	}
+    	if (slow){
+    		max_drift=1/(max_drift*32);
+    	}
+    	else
+    		max_drift=1/(max_drift*16);
+    	while (h>=max_drift){
+    		h=h/2;
 
 		//h=max_drift;
-	}
-}
+    	}
+    }
 
-inline void SystEq::ComputeHstep(const double& prv, const double& next, double& h ){
+    inline void SystEq::ComputeHstep(const double& prv, const double& next, double& h ){
 
 	// double perc_prv;
 	/*
@@ -727,10 +727,10 @@ inline void SystEq::ComputeHstep(const double& prv, const double& next, double& 
         h=perc_prv/next;
 	 */
 
-	if (slow)
-		h= perc2/next;
-	else
-		h= perc1/next;
+    	if (slow)
+    		h= perc2/next;
+    	else
+    		h= perc1/next;
 
 	// double tmp_next=fabs(prv-next);
 	//cout<<endl<<prv<<" "<<perc_prv<<"  "<<tmp_next<<" "<<h<<endl;
@@ -740,7 +740,7 @@ inline void SystEq::ComputeHstep(const double& prv, const double& next, double& 
 	// cout<<"\tslow:"<<slow<<endl;
 	//cout<<"\t"<<perc_prv<<"  "<<tmp_next<<" "<<h<<endl;
 
-}
+    }
 
 
 
@@ -749,44 +749,44 @@ inline void SystEq::ComputeHstep(const double& prv, const double& next, double& 
 /* DESCRIPTION : SolveHODEEuler solves the hybrid ODE system using Euler method*/
 /**************************************************************/
 
-void  SystEq::SolveHODEEuler(double h,double perc1,double perc2,double Max_Time,int Max_Run,bool Info,double Print_Step,char *argv){
+    void  SystEq::SolveHODEEuler(double h,double perc1,double perc2,double Max_Time,int Max_Run,bool Info,double Print_Step,char *argv){
 
 	//assign factor for step
-	this->fh=h;
-	this->perc1=perc1;
-	this->perc2=perc2;
-	this->Max_Run=Max_Run;
+    	this->fh=h;
+    	this->perc1=perc1;
+    	this->perc2=perc2;
+    	this->Max_Run=Max_Run;
 	//For statistic
 	// #ifdef AUTOMATON
 	// FinalValueXRun=new double*[nPlaces+automaton.timers_num()];
 	// #else
-	FinalValueXRun=new double*[nPlaces];
+    	FinalValueXRun=new double*[nPlaces];
 	//#endif
-	for (int i=0;i<nPlaces;i++)
-	{
-		FinalValueXRun[i]=new double[Max_Run+1];
-		for (int j=0;j<Max_Run+1;j++)
-			FinalValueXRun[i][j]=0.0;
-	}
+    	for (int i=0;i<nPlaces;i++)
+    	{
+    		FinalValueXRun[i]=new double[Max_Run+1];
+    		for (int j=0;j<Max_Run+1;j++)
+    			FinalValueXRun[i][j]=0.0;
+    	}
 
 #ifdef AUTOMATON
-	double** FinalValueTimerXRun=new double*[automaton.timers_num()];
-	for (int i=0;i<automaton.timers_num();i++)
-	{
-		FinalValueTimerXRun[i]=new double[Max_Run+1];
-		for (int j=0;j<Max_Run+1;j++)
-			FinalValueTimerXRun[i][j]=0.0;
-	}
+    	double** FinalValueTimerXRun=new double*[automaton.timers_num()];
+    	for (int i=0;i<automaton.timers_num();i++)
+    	{
+    		FinalValueTimerXRun[i]=new double[Max_Run+1];
+    		for (int j=0;j<Max_Run+1;j++)
+    			FinalValueTimerXRun[i][j]=0.0;
+    	}
 #endif
 
-cout.precision(16);
-cout<<endl<<"Seed value: "<<seed<<endl<<endl;
-bool SIM=false;
-if (h==MAXSTEP)
-	SIM=true;
+    	cout.precision(16);
+    	cout<<endl<<"Seed value: "<<seed<<endl<<endl;
+    	bool SIM=false;
+    	if (h==MAXSTEP)
+    		SIM=true;
 
-int sizeMT=Max_Time/Print_Step+2;
-double** MeanTrace=nullptr;
+    	int sizeMT=Max_Time/Print_Step+2;
+    	double** MeanTrace=nullptr;
 if (Info){ //to Initialize the matrix storing trace values
 	MeanTrace=new double*[sizeMT];
 	for (int i=0;i<sizeMT;i++){
@@ -851,11 +851,11 @@ while(run<Max_Run){
 	{
 
 #else
-	while (time<Max_Time)
-	{
+		while (time<Max_Time)
+		{
 #endif
 
-		for (int i=0;i<nPlaces;i++)
+			for (int i=0;i<nPlaces;i++)
 		{//save previous step
 			// ValuePrv[i]=Value[i];
 			if (Info){
@@ -865,69 +865,69 @@ while(run<Max_Run){
 					if ((SIM)&&((NextPrintTime<time+epsilon1)||(NextPrintTime==0))){
 						MeanTrace[trace_step][i]+=Value[i];
 					}
+				}
+
+				ValuePrv[i]=Value[i];
 			}
-
-			ValuePrv[i]=Value[i];
-		}
-		if (Info){
-			if ((((NextPrintTime<time+epsilon1)))||(NextPrintTime==0))
-			{
-				trace_step++;
-				NextPrintTime+=Print_Step;
-			}
-		}
-
-		//compute transition enable value
-		getValTranFire();
-
-		SetTran[0]=0;
-		for(int t=0; t<nTrans; t++){
-			if (!NotEnable(t)){
-				bool inserted=false;
-				for (auto it=Trans[t].InOuPlaces.begin();(it!=Trans[t].InOuPlaces.end())&&(!inserted);++it){
-					//case bound
-					int i=*it;
-					if ((Value[i]<=LBound[i] || Value[i]<=SLBound[i])||(Value[i]>=UBound[i] || Value[i]>=SUBound[i])){
-
-						if (EnabledTransValueDis[t]>0){
-							SetTran[++SetTran[0]]=t;
-							inserted=true;
-						}
-						Trans[t].enable=false;
-					}
+			if (Info){
+				if ((((NextPrintTime<time+epsilon1)))||(NextPrintTime==0))
+				{
+					trace_step++;
+					NextPrintTime+=Print_Step;
 				}
 			}
 
-		}
+		//compute transition enable value
+			getValTranFire();
+
+			SetTran[0]=0;
+			for(int t=0; t<nTrans; t++){
+				if (!NotEnable(t)){
+					bool inserted=false;
+					for (auto it=Trans[t].InOuPlaces.begin();(it!=Trans[t].InOuPlaces.end())&&(!inserted);++it){
+					//case bound
+						int i=*it;
+						if ((Value[i]<=LBound[i] || Value[i]<=SLBound[i])||(Value[i]>=UBound[i] || Value[i]>=SUBound[i])){
+
+							if (EnabledTransValueDis[t]>0){
+								SetTran[++SetTran[0]]=t;
+								inserted=true;
+							}
+							Trans[t].enable=false;
+						}
+					}
+				}
+
+			}
 
 
-		int t=-1;
+			int t=-1;
 
 		//reset time step
 #if ADAPTATIVE
-		h=MAXSTEP;
-		ComputeHstep(h);
+			h=MAXSTEP;
+			ComputeHstep(h);
 #else
-		h=fh;
+			h=fh;
 #endif
 
-		if (time+h>Max_Time)
-			h=Max_Time-time;
-		if ((Info)&&(time+h>NextPrintTime)){
-			h=NextPrintTime-time;
-		}
+			if (time+h>Max_Time)
+				h=Max_Time-time;
+			if ((Info)&&(time+h>NextPrintTime)){
+				h=NextPrintTime-time;
+			}
 
 
 
-		if (SetTran[0]!=0)
-		{
-			Dsteps++;
-			t=fireEnableTrans(SetTran,h);
-		}
+			if (SetTran[0]!=0)
+			{
+				Dsteps++;
+				t=fireEnableTrans(SetTran,h);
+			}
 
 #ifdef AUTOMATON
-if  ((time<next_clock_automaton)&&(time+h>next_clock_automaton)){
-	h=next_clock_automaton-time;
+			if  ((time<next_clock_automaton)&&(time+h>next_clock_automaton)){
+				h=next_clock_automaton-time;
 	if (t!=-1){//reset transition since the step is smaller due to automaton
 		Trans[t].enable=false;
 		t=-1;
@@ -991,17 +991,17 @@ for (auto i=0;i<nPlaces;i++)
 cout<<endl;
 #endif
 
-	}
+}
 
 
 #ifdef AUTOMATON
-	if ((accepted_trace)&&(automaton.is_current_node_final_node())){
-		tot_accepted_traces++;
+if ((accepted_trace)&&(automaton.is_current_node_final_node())){
+	tot_accepted_traces++;
 #endif
 
 
 		//Print final time for each trace
-		if ((Info)){
+	if ((Info)){
 			for (int i=0;i<nPlaces;i++){//save previous step
 				MeanTrace[trace_step][i]+=Value[i];
 			}
@@ -1021,42 +1021,42 @@ cout<<endl;
 	}
 #endif
 	run++;
-	}
+}
 
-	if ((Info)){
-		ofstream out(string(argv)+".trace",ofstream::out);
-		out.precision(16);
-		if(!out){
-			throw Exception("*****Error opening output file *****\n\n");
-		}
-		out<<"Time";
+if ((Info)){
+	ofstream out(string(argv)+".trace",ofstream::out);
+	out.precision(16);
+	if(!out){
+		throw Exception("*****Error opening output file *****\n\n");
+	}
+	out<<"Time";
+	for (int j=0;j<nPlaces;j++){
+		out<<" "<<NamePlaces[j];
+	}
+	out<<endl;
+	for (int i=0;i<sizeMT&&(Print_Step*i<=Max_Time);i++){
+		out<<Print_Step*i+itime;
 		for (int j=0;j<nPlaces;j++){
-			out<<" "<<NamePlaces[j];
+#ifdef AUTOMATON
+			out<<" "<<MeanTrace[i][j]/tot_accepted_traces;
+#else
+			out<<" "<<MeanTrace[i][j]/run;
+#endif
 		}
 		out<<endl;
-		for (int i=0;i<sizeMT&&(Print_Step*i<=Max_Time);i++){
-			out<<Print_Step*i+itime;
-			for (int j=0;j<nPlaces;j++){
-#ifdef AUTOMATON
-				out<<" "<<MeanTrace[i][j]/tot_accepted_traces;
-#else
-				out<<" "<<MeanTrace[i][j]/run;
-#endif
-			}
-			out<<endl;
-		}
-		out.close();
-		for (int i=0;i<sizeMT;i++){
-			delete[] MeanTrace[i];
-		}
-		delete[] MeanTrace;
 	}
+	out.close();
+	for (int i=0;i<sizeMT;i++){
+		delete[] MeanTrace[i];
+	}
+	delete[] MeanTrace;
+}
 
 
 
-	cout.precision(16);
-	cout<<"\nMean at time "<<time<<":\n";
-	if(time){
+cout.precision(16);
+cout<<"\nMean at time "<<time<<":\n";
+if(time){
 		for (int i=0;i<nPlaces;i++)//save initial state
 		{
 #ifdef AUTOMATON
@@ -1134,20 +1134,20 @@ void  SystEq::SolveSDEEuler(double h,double perc1,double perc2,double Max_Time,i
 	}
 
 #ifdef AUTOMATON
-double** FinalValueTimerXRun=new double*[automaton.timers_num()];
-for (int i=0;i<automaton.timers_num();i++)
-{
-	FinalValueTimerXRun[i]=new double[Max_Run+1];
-	for (int j=0;j<Max_Run+1;j++)
-		FinalValueTimerXRun[i][j]=0.0;
-}
+	double** FinalValueTimerXRun=new double*[automaton.timers_num()];
+	for (int i=0;i<automaton.timers_num();i++)
+	{
+		FinalValueTimerXRun[i]=new double[Max_Run+1];
+		for (int j=0;j<Max_Run+1;j++)
+			FinalValueTimerXRun[i][j]=0.0;
+	}
 #endif
 
-cout.precision(16);
-cout<<endl<<"Seed value: "<<seed<<endl<<endl;
+	cout.precision(16);
+	cout<<endl<<"Seed value: "<<seed<<endl<<endl;
 
-int sizeMT=Max_Time/Print_Step+2;
-double** MeanTrace=nullptr;
+	int sizeMT=Max_Time/Print_Step+2;
+	double** MeanTrace=nullptr;
 if (Info){ //to Initialize the matrix storing trace values
 	MeanTrace=new double*[sizeMT];
 	for (int i=0;i<sizeMT;i++){
@@ -1210,10 +1210,10 @@ while(run<Max_Run){
 	while ((accepted_trace=automaton.syncr() ) &&(time<Max_Time))
 	{
 #else
-	while (time<Max_Time)
-	{
+		while (time<Max_Time)
+		{
 #endif
-for (int i=0;i<nPlaces;i++)
+			for (int i=0;i<nPlaces;i++)
 {//save previous step
 	ValuePrv[i]=Value[i];
 	if ((Info)&&((NextPrintTime<=time+epsilon)||(NextPrintTime==0))){
@@ -1266,12 +1266,12 @@ unsigned int i=headDirc;
 unsigned int  ind_maxvalD=0;
 double maxvalD=0.0;
 while (i!=DEFAULT)// for all places
-		{
+{
 	tmpvalD[i]=tmpvalS[i]= tmpvalSIM[i]=0.0;
 
 	int size =  VEq[i].getSize();
 	for (int j=0; j<size;j++)// for all components
-			{
+	{
 		int IdTran=VEq[i].getIdTrans(j);
 		if (!NotEnable(IdTran))//if transition is not disable by inhibitor arc or due to probabilistic step
 		{
@@ -1287,18 +1287,18 @@ while (i!=DEFAULT)// for all places
 		}
 			}// for all components
 	//to compute the most important variation
-	double increment=fabs(ValuePrv[i]-tmpvalD[i])/(ValuePrv[i]==0?1:ValuePrv[i]);
-	if (increment>maxvalD) {
-		ind_maxvalD=i;
-		maxvalD=increment;
-	}
+			double increment=fabs(ValuePrv[i]-tmpvalD[i])/(ValuePrv[i]==0?1:ValuePrv[i]);
+			if (increment>maxvalD) {
+				ind_maxvalD=i;
+				maxvalD=increment;
+			}
 	//to compute the most important variation
-	i=VEq[i].getNext();
+			i=VEq[i].getNext();
 		}
 //computing step
-h=fh;
+		h=fh;
 
-if ((!setBNoiseTrans())){
+		if ((!setBNoiseTrans())){
 	h=Max_Time-time;// no transitions enable in the diffusion process
 	//so we can extend the step
 }
@@ -1407,14 +1407,14 @@ this->PrintValue(cout);
 cout<<endl;
 #endif
 
-	}
+}
 #ifdef AUTOMATON
-	if ((accepted_trace)&&(automaton.is_current_node_final_node())){
-		tot_accepted_traces++;
+if ((accepted_trace)&&(automaton.is_current_node_final_node())){
+	tot_accepted_traces++;
 #endif
 
 		//Print final time for each trace
-		if ((Info)){
+	if ((Info)){
 			for (int i=0;i<nPlaces;i++){//save previous step
 				MeanTrace[trace_step][i]+=Value[i];
 			}
@@ -1434,45 +1434,45 @@ cout<<endl;
 	}
 #endif
 	run++;
-	}
+}
 
-	if ((Info)){
-		ofstream out(string(argv)+".trace",ofstream::out);
-		out.precision(16);
-		if(!out){
-			throw Exception("*****Error opening output file *****\n\n");
-		}
+if ((Info)){
+	ofstream out(string(argv)+".trace",ofstream::out);
+	out.precision(16);
+	if(!out){
+		throw Exception("*****Error opening output file *****\n\n");
+	}
 
 		//Header file
-		out<<"Time";
+	out<<"Time";
+	for (int j=0;j<nPlaces;j++){
+		out<<" "<<NamePlaces[j]<<" ";
+	}
+	out<<endl;
+
+
+	for (int i=0;i<sizeMT&&Print_Step*i<=Max_Time;i++){
+		out<<Print_Step*i+itime;
 		for (int j=0;j<nPlaces;j++){
-			out<<" "<<NamePlaces[j]<<" ";
+#ifdef AUTOMATON
+			out<<" "<<MeanTrace[i][j]/tot_accepted_traces;
+#else
+			out<<" "<<MeanTrace[i][j]/run;
+#endif
 		}
 		out<<endl;
-
-
-		for (int i=0;i<sizeMT&&Print_Step*i<=Max_Time;i++){
-			out<<Print_Step*i+itime;
-			for (int j=0;j<nPlaces;j++){
-#ifdef AUTOMATON
-				out<<" "<<MeanTrace[i][j]/tot_accepted_traces;
-#else
-				out<<" "<<MeanTrace[i][j]/run;
-#endif
-			}
-			out<<endl;
-		}
-		out.close();
-		for (int i=0;i<sizeMT;i++){
-			delete[] MeanTrace[i];
-		}
-		delete[] MeanTrace;
 	}
+	out.close();
+	for (int i=0;i<sizeMT;i++){
+		delete[] MeanTrace[i];
+	}
+	delete[] MeanTrace;
+}
 
 
-	cout<<"\nMean at time "<<time<<":\n";
-	if(time)
-	{
+cout<<"\nMean at time "<<time<<":\n";
+if(time)
+{
 		for (int i=0;i<nPlaces;i++)//save initial state
 		{
 #ifdef AUTOMATON
@@ -1547,11 +1547,11 @@ void  SystEq::derived(){
 		if (Value[i]<0)
 		{//normalization
 			Value[i]=0;
-		for (int j=0;j<VEq[i].getSizeP()-1;j++)
-		{
-			VEq[i].getPsemflw(j,place);
-			Value[place]= Value[place]/value*coff;
-		}
+			for (int j=0;j<VEq[i].getSizeP()-1;j++)
+			{
+				VEq[i].getPsemflw(j,place);
+				Value[place]= Value[place]/value*coff;
+			}
 		}//normalization
 		i=VEq[i].getNext();
 	}
@@ -1580,8 +1580,8 @@ void  SystEq::derived(bool& neg){
 		Value[i] = coff - value;
 		if (Value[i]<0)
 		{//normalization
-            neg=true;
-            return;
+			neg=true;
+			return;
 		}//normalization
 		i=VEq[i].getNext();
 	}
@@ -1613,11 +1613,11 @@ void  SystEq::derived(double* Value){
 		if (Value[i]<0)
 		{//normalization
 			Value[i]=0;
-		for (int j=0;j<VEq[i].getSizeP()-1;j++)
-		{
-			VEq[i].getPsemflw(j,place);
-			Value[place]= Value[place]/value*coff;
-		}
+			for (int j=0;j<VEq[i].getSizeP()-1;j++)
+			{
+				VEq[i].getPsemflw(j,place);
+				Value[place]= Value[place]/value*coff;
+			}
 		}//normalization
 		i=VEq[i].getNext();
 	}
@@ -1715,13 +1715,13 @@ void  SystEq::SolveODEEuler(double h,double perc1,double perc2,double Max_Time,b
 		{
 			tmpval[i]=0.0;
 			for (int j=0; j<VEq[i].getSize();j++)// for all components
-					{
+			{
 				double val=0.0;
 				if ((!NotEnable(VEq[i].getIdTrans(j)))&&((val=EnabledTransValueCon[VEq[i].getIdTrans(j)])>0))//if transition is not disable by inhibitor arc
 				{
 					tmpval[i]+=VEq[i].getIncDec(j)*Trans[VEq[i].getIdTrans(j)].rate*val;
 				}
-					}
+			}
 
 			double increment=fabs(ValuePrv[i]-tmpval[i]);
 			if (increment>maxvalD) {
@@ -2006,18 +2006,18 @@ void  SystEq::SolveODE45(double h, double perc1,double Max_Time,bool Info,double
 				h=h*delta;
 		//cout<<"h:"<<h<<endl;
 
-		if (time+h>Max_Time)
-		{
-			h=Max_Time-time;
-		}
-		else
-		{
-			if ((time+h>NextPrintTime)){
-				h=NextPrintTime-time;
+			if (time+h>Max_Time)
+			{
+				h=Max_Time-time;
 			}
-		}
+			else
+			{
+				if ((time+h>NextPrintTime)){
+					h=NextPrintTime-time;
+				}
+			}
 
-	}
+		}
 
 
 
@@ -2275,18 +2275,18 @@ void  SystEq::SolveODERKF(double h, double perc1,double Max_Time,bool Info,doubl
 				h=h*delta;
 		//cout<<"h:"<<h<<endl;
 
-		if (time+h>Max_Time)
-		{
-			h=Max_Time-time;
-		}
-		else
-		{
-			if ((time+h>NextPrintTime)){
-				h=NextPrintTime-time;
+			if (time+h>Max_Time)
+			{
+				h=Max_Time-time;
 			}
-		}
+			else
+			{
+				if ((time+h>NextPrintTime)){
+					h=NextPrintTime-time;
+				}
+			}
 
-	}
+		}
 
 
 
@@ -2334,13 +2334,13 @@ inline void  SystEq::StepODERK5( double* Yn, double* Kn, const double& h){
 	{
 		Kn[i]=0.0;
 		for (int j=0; j<VEq[i].getSize();j++)// for all components
-				{
+		{
 			double val=0.0;
 			if ((!NotEnable(VEq[i].getIdTrans(j)))&&((val=EnabledTransValueCon[VEq[i].getIdTrans(j)])>0))//if transition is not disable by inhibitor arc
 			{
 				Kn[i]+=VEq[i].getIncDec(j)*Trans[VEq[i].getIdTrans(j)].rate*val;
 			}
-				}
+		}
 		Kn[i]*=h;
 		i=VEq[i].getNext();//next place that is computed directly
 	}
@@ -2362,13 +2362,13 @@ void SystEq::fex(double t, double *y, double *ydot, void *data){
 	{
 		ydot[i]=0.0;
 		for (int j=0; j<VEq[i].getSize();j++)// for all components
-				{
-		    double val=0.0;
+		{
+			double val=0.0;
 			if ((!NotEnable(VEq[i].getIdTrans(j)))&&((val=EnabledTransValueCon[VEq[i].getIdTrans(j)])>0))//if transition is not disable by inhibitor arc
 			{
 				ydot[i]+=VEq[i].getIncDec(j)*Trans[VEq[i].getIdTrans(j)].rate*val;//observe that rate==1 for general transition
 			}
-				}
+		}
 		i=VEq[i].getNext();//next place that is computed directly
 	}
 	//derived(ydot,y);// it derives all the rest of places
@@ -2432,7 +2432,7 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 		for (int i=0;i<nPlaces;i++)
 			out<<" "<<NamePlaces[i];
 #ifdef CGLPK
-      	for (unsigned int i=0;i<vec_fluxb.size();++i){
+		for (unsigned int i=0;i<vec_fluxb.size();++i){
 			vec_fluxb[i].printFluxName(outflux[i]);		
 			if (Variability){
 				vec_fluxb[i].printFluxNameMinMax(outflux[i]);	
@@ -2445,7 +2445,7 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 	cout.precision(16);
 
 	//initialize time
-    t=itime;
+	t=itime;
 
 	y[0]=0.0;
 
@@ -2453,7 +2453,7 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 		y[j]=Value[j-1];
 		if (Info){
 			out<<" "<<y[j];
-			}
+		}
 		atol[j]=perc1;
 		rtol[j]=perc2;
 	}
@@ -2461,9 +2461,9 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 	if (Info){
 #ifdef CGLPK
 		getValTranFire(y+1);
-      	for (unsigned int i=0;i<vec_fluxb.size();++i){
-      		outflux[i]<<endl<<itime<<" ";
-      		vec_fluxb[i].printObject(outflux[i]);
+		for (unsigned int i=0;i<vec_fluxb.size();++i){
+			outflux[i]<<endl<<itime<<" ";
+			vec_fluxb[i].printObject(outflux[i]);
 			vec_fluxb[i].printValue(outflux[i]);
 			if (Variability){
 				vec_fluxb[i].printLowerMax(outflux[i]);	
@@ -2471,11 +2471,11 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 		}	
 #endif
 //		out<<endl;
-		}
+	}
 	while(tout<=Max_Time){
 		lsoda(*this,neq, y, &t, tout, itol, rtol, atol, itask, &istate, iopt, jt,
-				iwork1, iwork2, iwork5, iwork6, iwork7, iwork8, iwork9,
-				rwork1, rwork5, rwork6, rwork7, 0);
+			iwork1, iwork2, iwork5, iwork6, iwork7, iwork8, iwork9,
+			rwork1, rwork5, rwork6, rwork7, 0);
 //***********************************************************************************
 //Observe istate=1 reset the integration. It assures that the next step starts really from tout however it slows the process.
 //It is necessary only when you want to stop integration and we want to be sure that it will start exactly from that previous endpoint. 
@@ -2483,20 +2483,20 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 //***********************************************************************************		
 		if (Info){
 			out<<endl<<tout<<" ";
-			}
+		}
 		derived(y+1);
 		if (Info){
-            for (int j=1;j<=nPlaces;j++){
+			for (int j=1;j<=nPlaces;j++){
 				out<<y[j]<<" ";
-            }
+			}
 			
-        	
+
 #ifdef CGLPK
-            time=tout;
-            getValTranFire(y+1);
-        	for (unsigned int i=0;i<vec_fluxb.size();++i){
-        		outflux[i]<<endl<<tout<<" ";
-        		vec_fluxb[i].printObject(outflux[i]);
+			time=tout;
+			getValTranFire(y+1);
+			for (unsigned int i=0;i<vec_fluxb.size();++i){
+				outflux[i]<<endl<<tout<<" ";
+				vec_fluxb[i].printObject(outflux[i]);
 				vec_fluxb[i].printValue(outflux[i]);
 				if (Variability){
 					vec_fluxb[i].printLowerMax(outflux[i]);	
@@ -2507,7 +2507,7 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 		}		
 		tout+=Print_Step;
 
-	
+
 		
 		if (istate <= 0){
 			throw   Exception("*****Error during the integration step*****\n\n");
@@ -2549,15 +2549,15 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 /**************************************************************/
 int SystEq::getComputeTau(int SetTran[], double& nextTimePoint,double t){
 
-double tau=0.0;
+	double tau=0.0;
 
-if (SetTran[0]!=0)
+	if (SetTran[0]!=0)
 	{
 		int size= SetTran[0];
 		double sumRate=0.0;
 
 		for (int i=1;i<=size;++i){
-		if (EnabledTransValueDis[SetTran[i]]!=0){
+			if (EnabledTransValueDis[SetTran[i]]!=0){
             /*It is not necessary since rate of generic transition is one by default!!!
             if (Trans[SetTran[i]].GenFun==""){
                 sumRate+=EnabledTransValueDis[SetTran[i]]*Trans[SetTran[i]].rate;
@@ -2571,40 +2571,40 @@ if (SetTran[0]!=0)
            /// cout<<NameTrans[i]<<" "<<sumRate<<endl;
 
                    */
-             sumRate+=EnabledTransValueDis[SetTran[i]]*Trans[SetTran[i]].rate;
-            }
+				sumRate+=EnabledTransValueDis[SetTran[i]]*Trans[SetTran[i]].rate;
+			}
 
-		TransRate[i-1]=sumRate;
+			TransRate[i-1]=sumRate;
 	//	cout<<"i "<< i<<" sumRate:"<<sumRate<<NameTrans[SetTran[i]]<<endl;
 		}
 
 
-    if (sumRate==0.0)
-        return -1;
-    std::exponential_distribution<> ExpD(sumRate);
- 	tau=(ExpD(generator)+t);
+		if (sumRate==0.0)
+			return -1;
+		std::exponential_distribution<> ExpD(sumRate);
+		tau=(ExpD(generator)+t);
    // cout<<"\nReaction:"<<tau<<" "<<tau-t<<endl;
- 	if (tau>=nextTimePoint)
-        return -1;
-    nextTimePoint=tau;
+		if (tau>=nextTimePoint)
+			return -1;
+		nextTimePoint=tau;
 
-    std::uniform_real_distribution<> UnfRealD(0.0,1.0);
-    double val=UnfRealD(generator)*sumRate;
+		std::uniform_real_distribution<> UnfRealD(0.0,1.0);
+		double val=UnfRealD(generator)*sumRate;
     //int trans=1;
    // while (val>TransRate[trans]) ++trans;
    // cout<<"\nval "<<val<<endl;
-     int lo = 0, hi = size - 1;
-     while (lo < hi) {
-        int mid = lo + (hi - lo)/2;
-        if (TransRate[mid] < val)
-         lo = mid + 1;
-      else
-         hi = mid;
-     }
+		int lo = 0, hi = size - 1;
+		while (lo < hi) {
+			int mid = lo + (hi - lo)/2;
+			if (TransRate[mid] < val)
+				lo = mid + 1;
+			else
+				hi = mid;
+		}
   //  cout<<"trans "<<NameTrans[SetTran[lo+1]]<<" id"<<lo+1<<endl;
-    return SetTran[lo+1];
-    }
-return -1;
+		return SetTran[lo+1];
+	}
+	return -1;
 }
 
 /**************************************************************/
@@ -2617,14 +2617,14 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 	double ValuePrv_tmp =  ValuePrv[ider];
 
     // let's calculate the first part of the formula with h
-    ValuePrv[ider] =  ValuePrv[ider] + hstep;
+	ValuePrv[ider] =  ValuePrv[ider] + hstep;
 	// cout << "hstep = " << hstep << " ValuePrv_tmp = " << ValuePrv_tmp <<"; ValuePrv = " << ValuePrv[ider] <<"\n";
 //	double fh = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #ifdef CGLPK
      //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
-    	double fh = Trans[T].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,T,time);
+	double fh = Trans[T].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #else
-    	double fh = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
+	double fh = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	
 
 	ValuePrv[ider] = ValuePrv[ider] + hstep ;
@@ -2637,7 +2637,7 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 	double f2h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	
 
-    ValuePrv[ider] = ValuePrv_tmp - hstep;
+	ValuePrv[ider] = ValuePrv_tmp - hstep;
 	//double fmh = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
@@ -2656,7 +2656,7 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 	double fm2h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	
 
-	double s1 = (- f2h + 8*fh - 8*fmh + fm2h) / (12*hstep) ;
+	double s1 = (- f2h + 8*fh - 8*fmh + fm2h) / (12*hstep);
 
 	// let's calculate the second part of the formula with 2h
 	ValuePrv[ider] = ValuePrv_tmp + hstep + hstep + hstep + hstep;
@@ -2669,7 +2669,7 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 	double f4h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	  
 
-    ValuePrv[ider] = ValuePrv_tmp - hstep - hstep - hstep - hstep;
+	ValuePrv[ider] = ValuePrv_tmp - hstep - hstep - hstep - hstep;
 //	double fm4h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
@@ -2730,8 +2730,8 @@ double SystEq::getComputeTauGillespie(int SetTran[],double t, double hstep){
 
 		int size= SetTran[0];//number of stochastic transitions
 
-        if(first==true){
-            for(int h=1;h<=size;h++){
+		if(first==true){
+			for(int h=1;h<=size;h++){
 
             /*It is not necessary since rate of generic transition is one by default!!!
 
@@ -2743,183 +2743,183 @@ double SystEq::getComputeTauGillespie(int SetTran[],double t, double hstep){
                     a_0+=EnabledTransValueDis[SetTran[h]];
                 }
             */
-             a_0+=EnabledTransValueDis[SetTran[h]]*Trans[SetTran[h]].rate;
-            }
-            first=false;
-        }
+				a_0+=EnabledTransValueDis[SetTran[h]]*Trans[SetTran[h]].rate;
+			}
+			first=false;
+		}
 
 
 		for (int k=1;k<=size;k++){// fixing a specific transition j among the stochastic ones (SetTran)
-            int j=SetTran[k];
-            if ((EnabledTransValueDis[j]!=0)){
+			int j=SetTran[k];
+			if ((EnabledTransValueDis[j]!=0)){
                 //if (Trans[j].FuncT==nullptr){
                     int N=Trans[j].InPlaces.size();// numero specie coinvolte nella reazione j-esima
                     double mu=0;
                     double sigma2=0;
                     double tmp;
-					int idp =0;
-					for(int i=0;i<N;i++){
-						idp=Trans[j].InPlaces[i].Id;
+                    int idp =0;
+                    for(int i=0;i<N;i++){
+                    	idp=Trans[j].InPlaces[i].Id;
                         if(Trans[j].GenFun!=""){// check if j is a generic transition
-							DerivTAUG[idp]=RichardsonExtrap(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,j,time,hstep,idp);
+                        	DerivTAUG[idp]=RichardsonExtrap(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,j,time,hstep,idp);
 						// cout << "time = " << t << " Val= "<< ValuePrv[idp] << " DerivGen = " << DerivTAUG[idp] << "\n";
-						}
-						else{
-							DerivTAUG[idp]=(EnabledTransValueDis[j]*Trans[j].rate)*(Trans[j].InPlaces[i].Card/ValuePrv[idp]);
+                        }
+                        else{
+                        	DerivTAUG[idp]=(EnabledTransValueDis[j]*Trans[j].rate)*(Trans[j].InPlaces[i].Card/ValuePrv[idp]);
 						// cout << "time = " << t << " Val= "<< ValuePrv[idp] << " Deriv = " << DerivTAUG[idp] << "\n";
-						}
+                        }
 
-					}
+                    }
 
                     for (int kk=1;kk<=size;kk++)//all the transitions
-                        {
-                        int jp=SetTran[kk];
-                        double f=0;
-                        if (EnabledTransValueDis[jp]!=0){
-                                for(int i=0;i<N;i++){
-									idp=Trans[j].InPlaces[i].Id;
-                                    f+=DerivTAUG[idp]*VEq[idp].getIncDecTran(jp);
-                                }
-                                mu+=f*EnabledTransValueDis[jp]*Trans[jp].rate;
-                                sigma2+=f*f*EnabledTransValueDis[jp]*Trans[jp].rate;
-                            }
-                        }
+                    {
+                    	int jp=SetTran[kk];
+                    	double f=0;
+                    	if (EnabledTransValueDis[jp]!=0){
+                    		for(int i=0;i<N;i++){
+                    			idp=Trans[j].InPlaces[i].Id;
+                    			f+=DerivTAUG[idp]*VEq[idp].getIncDecTran(jp);
+                    		}
+                    		mu+=f*EnabledTransValueDis[jp]*Trans[jp].rate;
+                    		sigma2+=f*f*EnabledTransValueDis[jp]*Trans[jp].rate;
+                    	}
+                    }
                     tmp=min(epsTAU*a_0/fabs(mu),epsTAU*a_0*epsTAU*a_0/sigma2);//}
-                if (tmp<tau){
-                    tau=tmp;
+                    if (tmp<tau){
+                    	tau=tmp;
+                    }
                 }
-			}
+            }
         }
-	}
-	else{
-		 throw Exception("*****There are no possible reactions, hence the time step is null*****\n\n");
-		 tau=0;
-	}
-		return tau;
-}
+        else{
+        	throw Exception("*****There are no possible reactions, hence the time step is null*****\n\n");
+        	tau=0;
+        }
+        return tau;
+    }
 
 
 /**************************************************************/
 /* NAME :  Class SystEq*/
 /* DESCRIPTION : It solves the ODE system using  LSODA method*/
 /**************************************************************/
-void SystEq::SolveHLSODE(double h,double perc1,double perc2,double Max_Time,int Max_Run,bool Info,double Print_Step,char *argv){
+    void SystEq::SolveHLSODE(double h,double perc1,double perc2,double Max_Time,int Max_Run,bool Info,double Print_Step,char *argv){
 
 
 
-	double          rwork1, rwork5, rwork6, rwork7;
-	double          atol[nPlaces+1], rtol[nPlaces+1], y[nPlaces+1], t, tout=Print_Step+itime;
-	int             iwork1, iwork2, iwork5, iwork6, iwork7, iwork8, iwork9;
-	int             neq = nPlaces;
-	int             itol=2, itask=1, istate=1, iopt=0, jt=2;
+    	double          rwork1, rwork5, rwork6, rwork7;
+    	double          atol[nPlaces+1], rtol[nPlaces+1], y[nPlaces+1], t, tout=Print_Step+itime;
+    	int             iwork1, iwork2, iwork5, iwork6, iwork7, iwork8, iwork9;
+    	int             neq = nPlaces;
+    	int             itol=2, itask=1, istate=1, iopt=0, jt=2;
 
-	iwork1 = iwork2 = iwork5 = iwork6 = iwork7 = iwork8 = iwork9 = 0;
-	rwork1 = rwork5 = rwork6 = rwork7 = 0.0;
+    	iwork1 = iwork2 = iwork5 = iwork6 = iwork7 = iwork8 = iwork9 = 0;
+    	rwork1 = rwork5 = rwork6 = rwork7 = 0.0;
 
 
-	this->Max_Run=Max_Run;
+    	this->Max_Run=Max_Run;
 	//For statistic
-	FinalValueXRun=new double*[nPlaces];
-    double Mean[nPlaces];
-    std::fill(Mean, Mean+nPlaces, 0.0);
+    	FinalValueXRun=new double*[nPlaces];
+    	double Mean[nPlaces];
+    	std::fill(Mean, Mean+nPlaces, 0.0);
 
 	//For negative marking
-	double ValuePrev[nPlaces+1];
-	std::fill(ValuePrev, ValuePrev+nPlaces+1, 0.0);
+    	double ValuePrev[nPlaces+1];
+    	std::fill(ValuePrev, ValuePrev+nPlaces+1, 0.0);
 
 
-    cout<<endl<<"Seed value: "<<seed<<endl<<endl;
+    	cout<<endl<<"Seed value: "<<seed<<endl<<endl;
 
-    ofstream out;
-    if (Info)
-	{
-		out.open(string(argv)+".trace",ofstream::out);
-		out.precision(16);
-		if(!out)
-		{
-			throw Exception("*****Error opening output file *****\n\n");
+    	ofstream out;
+    	if (Info)
+    	{
+    		out.open(string(argv)+".trace",ofstream::out);
+    		out.precision(16);
+    		if(!out)
+    		{
+    			throw Exception("*****Error opening output file *****\n\n");
 
-		}
-		out<<"Time";
-		for (int i=0;i<nPlaces;i++)
-			out<<" "<<NamePlaces[i];
-		out<<endl;
-	}
-
-
-	cout.precision(16);
-
-    for (int i=0;i<nPlaces;i++)
-	{
-		FinalValueXRun[i]=new double[Max_Run+1];
-		for (int j=0;j<Max_Run+1;j++)
-			FinalValueXRun[i][j]=0.0;
-		atol[i]=perc1;
-		rtol[i]=perc2;
-	}
-    atol[nPlaces]=perc1;
-    rtol[nPlaces]=perc2;
+    		}
+    		out<<"Time";
+    		for (int i=0;i<nPlaces;i++)
+    			out<<" "<<NamePlaces[i];
+    		out<<endl;
+    	}
 
 
-   int SetTran[nTrans+1];
-   std::fill(SetTran, SetTran + nTrans + 1, 0);
+    	cout.precision(16);
+
+    	for (int i=0;i<nPlaces;i++)
+    	{
+    		FinalValueXRun[i]=new double[Max_Run+1];
+    		for (int j=0;j<Max_Run+1;j++)
+    			FinalValueXRun[i][j]=0.0;
+    		atol[i]=perc1;
+    		rtol[i]=perc2;
+    	}
+    	atol[nPlaces]=perc1;
+    	rtol[nPlaces]=perc2;
+
+
+    	int SetTran[nTrans+1];
+    	std::fill(SetTran, SetTran + nTrans + 1, 0);
 
 
 //disable discrite transition from fluid computation
-    for (int i=0;i<nTrans;i++)
-	{
-     if (Trans[i].discrete){
-        SetTran[++SetTran[0]]=i;
-        Trans[i].enable=false;
-        }
-	}
+    	for (int i=0;i<nTrans;i++)
+    	{
+    		if (Trans[i].discrete){
+    			SetTran[++SetTran[0]]=i;
+    			Trans[i].enable=false;
+    		}
+    	}
 
-	int run=0;
-
-
+    	int run=0;
 
 
 
 
 
-	while (run<Max_Run){
 
-	if (run%100==0){
-		cout<<"\r\t START RUN..."<<run<<" ";
-		cout.flush();
-	}
+
+    	while (run<Max_Run){
+
+    		if (run%100==0){
+    			cout<<"\r\t START RUN..."<<run<<" ";
+    			cout.flush();
+    		}
 		//Initialization for each run
-		ValuePrev[0]=y[0]=0.0;
+    		ValuePrev[0]=y[0]=0.0;
 
-        if (Info){
-            out<<itime;
-        }
-        for (int j=1;j<=nPlaces;j++){
-            y[j]=ValuePrev[j]=Value[j-1];
-            if (Info){
-                out<<" "<<y[j];
-            }
-        }
-        if (Info){
-            out<<endl;;
-        }
+    		if (Info){
+    			out<<itime;
+    		}
+    		for (int j=1;j<=nPlaces;j++){
+    			y[j]=ValuePrev[j]=Value[j-1];
+    			if (Info){
+    				out<<" "<<y[j];
+    			}
+    		}
+    		if (Info){
+    			out<<endl;;
+    		}
 
-        double nextTimePoint=tout=Print_Step+itime;
-        istate=1;
-        t=itime;
+    		double nextTimePoint=tout=Print_Step+itime;
+    		istate=1;
+    		t=itime;
 
-        bool neg=false;
-        double tmpt=t;
+    		bool neg=false;
+    		double tmpt=t;
 
-        while(t<=Max_Time){
-            if (!neg){
-                time=nextTimePoint;
-                getValTranFire(y+1);
+    		while(t<=Max_Time){
+    			if (!neg){
+    				time=nextTimePoint;
+    				getValTranFire(y+1);
 
-            }
-            neg=false;
+    			}
+    			neg=false;
         //compute tau
-            int Tran=getComputeTau(SetTran,nextTimePoint,t);
+    			int Tran=getComputeTau(SetTran,nextTimePoint,t);
 /*
             cout<<"TIME:"<<nextTimePoint<<" ";
             if (Tran!=-1)
@@ -2930,67 +2930,67 @@ void SystEq::SolveHLSODE(double h,double perc1,double perc2,double Max_Time,int 
 
 
         //tmpt=t;
-            lsoda(*this,neq, y, &t, nextTimePoint, itol, rtol, atol, itask, &istate, iopt, jt,
-				iwork1, iwork2, iwork5, iwork6, iwork7, iwork8, iwork9,
-				rwork1, rwork5, rwork6, rwork7, 0);
+    			lsoda(*this,neq, y, &t, nextTimePoint, itol, rtol, atol, itask, &istate, iopt, jt,
+    				iwork1, iwork2, iwork5, iwork6, iwork7, iwork8, iwork9,
+    				rwork1, rwork5, rwork6, rwork7, 0);
         //t=nextTimePoint;
             //check if the selected descrete transition can fire (no negative markings)
 
-            if (Tran!=-1){
-                int size=(Trans[Tran].Places).size();
-                for (int i=0;i<size&&!neg;++i){
-                    y[(Trans[Tran].Places[i]).Id+1]+=(Trans[Tran].Places[i]).Card;
-                    if   (y[(Trans[Tran].Places[i]).Id+1]<0)
-                        neg=true;
-                }
-            istate=1;
-            }
-            if (neg){
-            for (int j=0;j<=nPlaces;j++){
-                    y[j]=ValuePrev[j];
-                }
-              t=tmpt;
-              nextTimePoint= (tmpt+(nextTimePoint-tmpt)/2);
-            }
-            else
-            {
-			    for (int j=0;j<=nPlaces;j++){
-                    ValuePrev[j]=y[j];
-                }
-                tmpt=t;
-                derived(y+1);
+    			if (Tran!=-1){
+    				int size=(Trans[Tran].Places).size();
+    				for (int i=0;i<size&&!neg;++i){
+    					y[(Trans[Tran].Places[i]).Id+1]+=(Trans[Tran].Places[i]).Card;
+    					if   (y[(Trans[Tran].Places[i]).Id+1]<0)
+    						neg=true;
+    				}
+    				istate=1;
+    			}
+    			if (neg){
+    				for (int j=0;j<=nPlaces;j++){
+    					y[j]=ValuePrev[j];
+    				}
+    				t=tmpt;
+    				nextTimePoint= (tmpt+(nextTimePoint-tmpt)/2);
+    			}
+    			else
+    			{
+    				for (int j=0;j<=nPlaces;j++){
+    					ValuePrev[j]=y[j];
+    				}
+    				tmpt=t;
+    				derived(y+1);
 
-                if (tout==nextTimePoint){
-                    if (Info){
-                     out<<nextTimePoint;
-                     for (int j=1;j<=nPlaces;j++){
-                        out<<" "<<y[j];
-                        }
-                     out<<endl;
-                     }
+    				if (tout==nextTimePoint){
+    					if (Info){
+    						out<<nextTimePoint;
+    						for (int j=1;j<=nPlaces;j++){
+    							out<<" "<<y[j];
+    						}
+    						out<<endl;
+    					}
 
-                    nextTimePoint=(tout+=Print_Step);
-                    }
-                else
-                    nextTimePoint=tout;
-            }
+    					nextTimePoint=(tout+=Print_Step);
+    				}
+    				else
+    					nextTimePoint=tout;
+    			}
 
-            if (istate <= 0){
-                throw   Exception("*****Error during the integration step*****\n\n");
+    			if (istate <= 0){
+    				throw   Exception("*****Error during the integration step*****\n\n");
 
-            }
-        }
+    			}
+    		}
 
         for (int i=0;i<nPlaces;i++)//store resul ode
         {
-            Mean[i]+=FinalValueXRun[i][run]= y[i+1];
+        	Mean[i]+=FinalValueXRun[i][run]= y[i+1];
         }
 
         ++run;
     }
 
 	//Print final time for each trace
-	cout<<"\n\nSolution at time "<<Max_Time<<":\n";
+    cout<<"\n\nSolution at time "<<Max_Time<<":\n";
 	for (int i=0;i<nPlaces;i++)//save initial state
 	{
 		cout<<"\t"<<NamePlaces[i]<<"~= "<<Mean[i]/run<<"\n";
@@ -3047,7 +3047,7 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 		for(int i=0;i<nPlaces;i++)
 			out<<" "<<NamePlaces[i];
 #ifdef CGLPK
-      	for (unsigned int i=0;i<vec_fluxb.size();++i){
+		for (unsigned int i=0;i<vec_fluxb.size();++i){
 			vec_fluxb[i].printFluxName(outflux[i]);		
 			if (Variability){
 				vec_fluxb[i].printFluxNameMinMax(outflux[i]);	
@@ -3084,10 +3084,10 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 
 	while (run<Max_Run){
 
-	if(run%100==0){
-		cout<<"\r\t START RUN..."<<run<<" ";
-		cout.flush();
-	}
+		if(run%100==0){
+			cout<<"\r\t START RUN..."<<run<<" ";
+			cout.flush();
+		}
 		//Initialization for each run
 		if(Info){
 			out<<endl<<itime;
@@ -3101,15 +3101,15 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 		}
 		if(Info){
 #ifdef CGLPK
-		getValTranFire(Value);
-      	for (unsigned int i=0;i<vec_fluxb.size();++i){
-      		outflux[i]<<endl<<itime<<" ";
-      		vec_fluxb[i].printObject(outflux[i]);
-			vec_fluxb[i].printValue(outflux[i]);
-			if (Variability){
-				vec_fluxb[i].printLowerMax(outflux[i]);	
-			}
-		}	
+			getValTranFire(Value);
+			for (unsigned int i=0;i<vec_fluxb.size();++i){
+				outflux[i]<<endl<<itime<<" ";
+				vec_fluxb[i].printObject(outflux[i]);
+				vec_fluxb[i].printValue(outflux[i]);
+				if (Variability){
+					vec_fluxb[i].printLowerMax(outflux[i]);	
+				}
+			}	
 #endif
 			out<<endl;
 		}
@@ -3123,52 +3123,52 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 
 		while(time<=Max_Time){
             //time=nextTimePoint;
-            getValTranFire(Value);
-            int Tran=getComputeTau(SetTran,nextTimePoint,time);
+			getValTranFire(Value);
+			int Tran=getComputeTau(SetTran,nextTimePoint,time);
 
             //cout<<Tran<<" "<<endl;
-            if (Tran!=-1){
-                int size=(Trans[Tran].Places).size();
-                for (int i=0;i<size;++i){
-                    Value[(Trans[Tran].Places[i]).Id]+=(Trans[Tran].Places[i]).Card;
-                }
-            }
+			if (Tran!=-1){
+				int size=(Trans[Tran].Places).size();
+				for (int i=0;i<size;++i){
+					Value[(Trans[Tran].Places[i]).Id]+=(Trans[Tran].Places[i]).Card;
+				}
+			}
 
-            time=nextTimePoint;
-            if(tout==nextTimePoint){
-					if(Info){
+			time=nextTimePoint;
+			if(tout==nextTimePoint){
+				if(Info){
 
 					out<<nextTimePoint;
 					for(int j=0; j<nPlaces;j++){
 
 						out<<" "<<Value[j];
-						}
-#ifdef CGLPK
-            	
-        		for (unsigned int i=0;i<vec_fluxb.size();++i){
-        			outflux[i]<<endl<<tout<<" ";
-        			vec_fluxb[i].printObject(outflux[i]);
-					vec_fluxb[i].printValue(outflux[i]);
-					if (Variability){
-						vec_fluxb[i].printLowerMax(outflux[i]);	
 					}
-				}	
+#ifdef CGLPK
+
+					for (unsigned int i=0;i<vec_fluxb.size();++i){
+						outflux[i]<<endl<<tout<<" ";
+						vec_fluxb[i].printObject(outflux[i]);
+						vec_fluxb[i].printValue(outflux[i]);
+						if (Variability){
+							vec_fluxb[i].printLowerMax(outflux[i]);	
+						}
+					}	
 #endif
 					out<<endl;
-					}
-					nextTimePoint=(tout+=Print_Step);
 				}
-				else
-					nextTimePoint=tout;
+				nextTimePoint=(tout+=Print_Step);
+			}
+			else
+				nextTimePoint=tout;
 
 		}
 
-	for (int i=0;i<nPlaces;i++)
-	{
-		Mean[i]+=FinalValueXRun[i][run]=Value[i];
-	}
+		for (int i=0;i<nPlaces;i++)
+		{
+			Mean[i]+=FinalValueXRun[i][run]=Value[i];
+		}
 
-	++run;
+		++run;
 
 	}
 	cout<<"\n\nSolution at time "<<Max_Time<<":\n";
@@ -3226,7 +3226,7 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 		for(int i=0;i<nPlaces;i++)
 			out<<" "<<NamePlaces[i];	
 #ifdef CGLPK
-      	for (unsigned int i=0;i<vec_fluxb.size();++i){
+		for (unsigned int i=0;i<vec_fluxb.size();++i){
 			vec_fluxb[i].printFluxName(outflux[i]);		
 			if (Variability){
 				vec_fluxb[i].printFluxNameMinMax(outflux[i]);	
@@ -3263,10 +3263,10 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 
 	while (run<Max_Run){
 
-	if(run%100==0){
-		cout<<"\r\t START RUN..."<<run<<" ";
-		cout.flush();
-	}
+		if(run%100==0){
+			cout<<"\r\t START RUN..."<<run<<" ";
+			cout.flush();
+		}
 		//Initialization for each run
 		if(Info){
 			out<<endl<<itime;
@@ -3280,15 +3280,15 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 		}
 		if(Info){
 #ifdef CGLPK
-		getValTranFire(Value);
-      	for (unsigned int i=0;i<vec_fluxb.size();++i){
-      		outflux[i]<<endl<<itime<<" ";
-      		vec_fluxb[i].printObject(outflux[i]);
-			vec_fluxb[i].printValue(outflux[i]);
-			if (Variability){
-				vec_fluxb[i].printLowerMax(outflux[i]);	
+			getValTranFire(Value);
+			for (unsigned int i=0;i<vec_fluxb.size();++i){
+				outflux[i]<<endl<<itime<<" ";
+				vec_fluxb[i].printObject(outflux[i]);
+				vec_fluxb[i].printValue(outflux[i]);
+				if (Variability){
+					vec_fluxb[i].printLowerMax(outflux[i]);	
+				}
 			}
-		}
 #endif			
 			out<<endl;;
 		}
@@ -3297,23 +3297,26 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 		//istate=1;
 		double t=MAX_DOUBLE,tmpt=itime;
 
+		bool neg=false;
 		DerivTAUG = new double[nPlaces];
 
 		while(nextTimePoint<=Max_Time){
 
+			if(!neg){
+				time=nextTimePoint;
+				getValTranFire();
+			}
 
-            time=nextTimePoint;
-			getValTranFire();
+			neg=false;
 
-
-		//compute DELTA questo sarà fisso
+		//compute tau
 
 			double tau=getComputeTauGillespie(SetTran,t, hstep);
 
 			nextTimePoint+=tau;
 			if (nextTimePoint>tout){
-                tau=tout-tmpt;
-                nextTimePoint=tout;
+				tau=tout-tmpt;
+				nextTimePoint=tout;
 			}
 
 			//cout<<"Tau: "<< tau<<endl;
@@ -3324,31 +3327,27 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 
 			}
 
-
-
-
 			for (int i=0;i<nTrans;i++){//oggi i=1 old
 				//oggi if(EnabledTransValueDis[i]!=0){
 				if(EnabledTransValueDis[i]!=0){
 					//oggi std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
-					 if (Trans[i].GenFun==""){
-					 	//QUI sarà da calcolare il p per le transizioni che non ricordo brava meh
-                          std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
-                          firing[i]=PoisD(generator);
-                          }
-                     else{
-                          std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]);
+					if (Trans[i].GenFun==""){
+						std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
+						firing[i]=PoisD(generator);
+					}
+					else{
+						std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]);
                           firing[i]=PoisD(generator);//oggi
-                          }
-				}
-				else
+                      }
+                  }
+                  else
 					firing[i]=0;//oggi
 			//cout<<"Firing: "<<firing[i];
 			}
 			//cout<<endl;
 
 			unsigned int i = headDirc;
-			while(i!=DEFAULT)
+			while(i!=DEFAULT && !neg)
 			{
 				double tmpvalSIM=0.0;
 				for(int j=0; j<VEq[i].getSize();j++)//for all components
@@ -3363,59 +3362,67 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 					}
 
 				}//for all components
-				/* questo non dovrebbe servire perché il valore non può andare sottozero
 				if (ValuePrv[i]+tmpvalSIM<0){
 					neg=true;
 				}
-				else{*/
-				Value[i]=ValuePrv[i]+tmpvalSIM;
-				i=VEq[i].getNext();
+				else{
+					Value[i]=ValuePrv[i]+tmpvalSIM;
+					i=VEq[i].getNext();
 
 
-				//}
+				}
 
 
 			}
-                t=MAX_DOUBLE;
-				for(int j=0;j<=nPlaces;j++){
-					ValuePrv[j]=Value[j];
-				}
+			if (!neg)
+                derived(neg);//it derives all the rest of places
+            if(neg){
+            	t=tau=tau/2;
+            	nextTimePoint=tmpt;
+            }
+            else
+            {
+            	t=MAX_DOUBLE;
+            	for(int j=0;j<=nPlaces;j++){
+            		ValuePrv[j]=Value[j];
+            	}
 				//tmpt=t;
-				if(tout==nextTimePoint){
-					if(Info){
+            	if(tout==nextTimePoint){
+            		if(Info){
 
-					out<<endl<<nextTimePoint;
-					for(int j=0; j<nPlaces;j++){
+            			out<<endl<<nextTimePoint;
+            			for(int j=0; j<nPlaces;j++){
 
-						out<<" "<<Value[j];
-						}
+            				out<<" "<<Value[j];
+            			}
 #ifdef CGLPK
-        			for (unsigned int i=0;i<vec_fluxb.size();++i){
-        				outflux[i]<<endl<<tout<<" ";
-        				vec_fluxb[i].printObject(outflux[i]);
-						vec_fluxb[i].printValue(outflux[i]);
-						if (Variability){
-							vec_fluxb[i].printLowerMax(outflux[i]);	
-						}
-					}
+            			for (unsigned int i=0;i<vec_fluxb.size();++i){
+            				outflux[i]<<endl<<tout<<" ";
+            				vec_fluxb[i].printObject(outflux[i]);
+            				vec_fluxb[i].printValue(outflux[i]);
+            				if (Variability){
+            					vec_fluxb[i].printLowerMax(outflux[i]);	
+            				}
+            			}
 #endif						
 //					out<<endl;
-					}
-					tout+=Print_Step;
-				}
-				tmpt=nextTimePoint;
+            		}
+            		tout+=Print_Step;
+            	}
+            	tmpt=nextTimePoint;
 
+            }
 
-		}
+        }
 
-	for (int i=0;i<nPlaces;i++)
-	{
-		Mean[i]+=FinalValueXRun[i][run]=Value[i];
-	}
+        for (int i=0;i<nPlaces;i++)
+        {
+        	Mean[i]+=FinalValueXRun[i][run]=Value[i];
+        }
 
-	++run;
+        ++run;
 
-	}
+    }
 }
 
 
@@ -3429,13 +3436,33 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Info,double Print_Step,char *argv){
 
 
+
 	this-> Max_Run=Max_Run;
 	FinalValueXRun = new double*[nPlaces];
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
+
+	//random gsl number generator
+	/*gsl_rng * r2;
+	gsl_rng_env_setup();
+	const gsl_rng_type * T;
+	T = gsl_rng_default;
+	r2 = gsl_rng_alloc (T);
+	gsl_rng_set(r2, seed);*/
+
+	const gsl_rng_type * T;
+    gsl_rng * r2;     
+    gsl_rng_env_setup();
+    T = gsl_rng_default;
+    r2 = gsl_rng_alloc (T);
+     
 	//double tout;
- 
+
 	cout << " OMG ENTRI QUI? E IL DELTA? " << delta << endl;
+
+	if(delta < 0){
+		throw Exception("Delta cannot be minor or equal 0.\n\n");
+	}
 
 	//double ValuePrev[nPlaces] {0.0};
 
@@ -3456,10 +3483,10 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 			throw Exception("*****Error opening output file***\n\n");
 		}
 		out<<"Time";
-	
+
 		for(int i=0;i<nPlaces;i++)
 			out<<" "<<NamePlaces[i];	
-	
+
 //		out<<endl;
 	}
 
@@ -3486,14 +3513,13 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 	}
 
 	int run=0;
-	double hstep = 0.00001;
 
 	while (run<Max_Run){
 
-	if(run%100==0){
-		cout<<"\r\t START RUN..."<<run<<" ";
-		cout.flush();
-	}
+		if(run%100==0){
+			cout<<"\r\t START RUN..."<<run<<" ";
+			cout.flush();
+		}
 		//Initialization for each run
 		if(Info){
 			out<<endl<<itime;
@@ -3506,7 +3532,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 			}
 		}
 		if(Info){
-		
+
 			out<<endl;;
 		}
 
@@ -3518,25 +3544,22 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 
 		while(nextTimePoint<=Max_Time){
 
-                time=nextTimePoint;
-				getValTranFire();
+			time=nextTimePoint;
+			//getValTranFire();
 			
 
+		//compute tau. AL POSTO DI COMPUTETAU, GET P CHE MI RESTITUISCE I PARAMETRI DELLA MULTINOMIALE
 
-		//compute tau
-
-			double tau=getComputeTauGillespie(SetTran,t, hstep);
-
-			nextTimePoint+=tau;
+			nextTimePoint+=delta;
 			if (nextTimePoint>tout){
-                tau=tout-tmpt;
-                nextTimePoint=tout;
+				delta=tout-tmpt;
+				nextTimePoint=tout;
 			}
 
 			//cout<<"Tau: "<< tau<<endl;
 			//cout<<"TIME:"<<nextTimePoint<<endl;
 
-			if(tau==-1){
+			if(delta==-1){
 				throw Exception("*****Error during the tau computation*****\n\n");
 
 			}
@@ -3546,18 +3569,33 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 			//LUNGHEZZA DEL VETTORE DI DOUBLE
 
 
-			for (int i=0;i<nTrans;i++){//oggi i=1 old
-				//oggi if(EnabledTransValueDis[i]!=0){
+			for (int i=0;i<nTrans;i++){
+
 				if(EnabledTransValueDis[i]!=0){
-					//oggi std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
-					 if (Trans[i].GenFun==""){
-                          std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
-                          firing[i]=PoisD(generator);
-                          }
-                     else{
-                          std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]);
-                          firing[i]=PoisD(generator);//oggi
-                          }
+
+					double total_marking = 0.0;
+
+					for (unsigned int k=0; k<Trans[i].InPlaces.size(); k++)//for all variables in the components
+					{
+						total_marking += Value[i];
+					}
+
+					std::array<double, 2> a_b = Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+					vector<double> p = getP(a_b[0], a_b[1], delta);
+					if(p.empty()){
+						firing[i]=0;
+					}
+					else {
+						//tenere d'occhio se si spracca tutto. In teoria nel vector gli elementi sono tenuti
+						// consecutivi quindi questo dovrebbe bastare a convertirlo in array
+						double* p_arr = &p[0];
+						int size = p.size();
+						unsigned int mult_op[size];
+						gsl_ran_multinomial(r2, size, total_marking, p_arr, mult_op);
+						//marcatura fittizia, dovrò fare il prodotto scalare dell'array della multinomiale restituito 
+						//per definire la nuova marcatura
+						firing[i]=4;
+					}	
 				}
 				else
 					firing[i]=0;//oggi
@@ -3575,6 +3613,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 					//{
 					//	tmpvalSIM+=VEq[i].getIncDec(j)*firing[VEq[i].getIdTrans(j)];
 					//}
+					
 					if(firing[VEq[i].getIdTrans(j)]!=0)
 					{
 						tmpvalSIM+=VEq[i].getIncDec(j)*firing[VEq[i].getIdTrans(j)];
@@ -3582,7 +3621,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 
 				}//for all components
 
-	
+
 				Value[i]=ValuePrv[i]+tmpvalSIM;
 				i=VEq[i].getNext();
 
@@ -3591,45 +3630,86 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 			}
                 derived();//it derives all the rest of places
                 t=MAX_DOUBLE;
-				for(int j=0;j<=nPlaces;j++){
-					ValuePrv[j]=Value[j];
-				}
+                for(int j=0;j<=nPlaces;j++){
+                	ValuePrv[j]=Value[j];
+                }
 				//tmpt=t;
-				if(tout==nextTimePoint){
-					if(Info){
+                if(tout==nextTimePoint){
+                	if(Info){
 
-					out<<endl<<nextTimePoint;
-					for(int j=0; j<nPlaces;j++){
+                		out<<endl<<nextTimePoint;
+                		for(int j=0; j<nPlaces;j++){
 
-						out<<" "<<Value[j];
-						}
+                			out<<" "<<Value[j];
+                		}
 #ifdef CGLPK
-        			for (unsigned int i=0;i<vec_fluxb.size();++i){
-        				outflux[i]<<endl<<tout<<" ";
-        				vec_fluxb[i].printObject(outflux[i]);
-						vec_fluxb[i].printValue(outflux[i]);
-						if (Variability){
-							vec_fluxb[i].printLowerMax(outflux[i]);	
-						}
-					}
+                		for (unsigned int i=0;i<vec_fluxb.size();++i){
+                			outflux[i]<<endl<<tout<<" ";
+                			vec_fluxb[i].printObject(outflux[i]);
+                			vec_fluxb[i].printValue(outflux[i]);
+                			if (Variability){
+                				vec_fluxb[i].printLowerMax(outflux[i]);	
+                			}
+                		}
 #endif						
 //					out<<endl;
-					}
-					tout+=Print_Step;
-				}
-				tmpt=nextTimePoint;
+                	}
+                	tout+=Print_Step;
+                }
+                tmpt=nextTimePoint;
 
-		}
+            }
 
-	for (int i=0;i<nPlaces;i++)
-	{
-		Mean[i]+=FinalValueXRun[i][run]=Value[i];
-	}
+            for (int i=0;i<nPlaces;i++)
+            {
+            	Mean[i]+=FinalValueXRun[i][run]=Value[i];
+            }
 
-	++run;
+            ++run;
 
-	}
-}
+        }
+
+    gsl_rng_free (r2);
+
+    }
+
+/***************************************************************/
+/* NAME :  Class SystEq*/
+/* DESCRIPTION : It estimates the integration step for Euler method*/
+/**************************************************************/
+
+
+    vector<double> SystEq::getP(double A, double B, double delta){
+
+    	if(A==0 && B ==0){
+    		return {};
+    	}
+
+    	double lambda = A - B;
+    	double alpha = (B*exp(lambda*delta)-B)/(A*exp(lambda*delta)-B);
+    	double beta=(A*exp(lambda*delta)-A)/(A*exp(lambda*delta)-B);
+
+    	vector<double> P(100, 0.0);
+  	//double P[100];
+	//P.fill(0.0);
+    	double sum_p = alpha;
+    	P[0] = alpha;
+    	int p_max = 0;
+    	for(std::size_t i = 1; i<100; i++){
+    		if(sum_p<0.99999999){
+    			P[i] = (1-alpha)*(1-beta)*pow(beta, i-1);
+    			sum_p=sum_p+P[i];
+    			p_max++;
+    		}
+    	}
+    	vector<double> P_new(P.begin(), P.end() - p_max);
+	//double P_new[p_max];
+	//std::copy(P.begin(), P.end() - p_max);
+    	int acc = std::accumulate(P_new.begin(),P_new.end()-1,0);
+    	P[p_max]=1-acc+P[p_max];
+    	return P_new;
+
+    }
 
 
 
@@ -3641,50 +3721,50 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 /* DESCRIPTION : It estimates the integration step for Euler method*/
 /**************************************************************/
 
-void  SystEq::HeuristicStep(double h,double perc1,double perc2,double Max_Time,bool Info,double Print_Step,char *argv){
+    void  SystEq::HeuristicStep(double h,double perc1,double perc2,double Max_Time,bool Info,double Print_Step,char *argv){
 
 	//assign factor for step
-	double tmpval[nPlaces];
-	this->fh=h;
-	this->perc1=perc1;
-	this->perc2=perc2;
-	this->Max_Run=1;
+    	double tmpval[nPlaces];
+    	this->fh=h;
+    	this->perc1=perc1;
+    	this->perc2=perc2;
+    	this->Max_Run=1;
 	//For statistic
-	FinalValueXRun=new  double*[nPlaces];
-	double* ValueInit=(double*)malloc(sizeof(double)*nPlaces);
+    	FinalValueXRun=new  double*[nPlaces];
+    	double* ValueInit=(double*)malloc(sizeof(double)*nPlaces);
 
-	for (int i=0;i<nPlaces;i++)
-	{
-		FinalValueXRun[i]=new double[Max_Run+1];
-		ValueInit[i]=Value[i];
-		for (int j=0;j<Max_Run+1;j++)
-			FinalValueXRun[i][j]=0.0;
-	}
+    	for (int i=0;i<nPlaces;i++)
+    	{
+    		FinalValueXRun[i]=new double[Max_Run+1];
+    		ValueInit[i]=Value[i];
+    		for (int j=0;j<Max_Run+1;j++)
+    			FinalValueXRun[i][j]=0.0;
+    	}
 
 
-	double NextPrintTime=itime;
-	ofstream out;
+    	double NextPrintTime=itime;
+    	ofstream out;
 
-	if (Info)
-	{
-		out.open(string(argv)+".trace",ofstream::out);
-		out.precision(16);
-		if(!out)
-		{
-			throw Exception("*****Error opening output file *****\n\n");
+    	if (Info)
+    	{
+    		out.open(string(argv)+".trace",ofstream::out);
+    		out.precision(16);
+    		if(!out)
+    		{
+    			throw Exception("*****Error opening output file *****\n\n");
 
-		}
-	}
-	cout.precision(16);
-	double Max_error;
-	double eT=perc2;
-	int MaxIter=20;
-	int Iter=0;
-	do
-	{
-		cout<<"Euler Step: "<<this->perc1<<endl;
-		Max_error=-1;
-		time=itime;
+    		}
+    	}
+    	cout.precision(16);
+    	double Max_error;
+    	double eT=perc2;
+    	int MaxIter=20;
+    	int Iter=0;
+    	do
+    	{
+    		cout<<"Euler Step: "<<this->perc1<<endl;
+    		Max_error=-1;
+    		time=itime;
 		for (int i=0;(i<nPlaces);i++)//return to the initial state
 		{
 			Value[i]=ValueInit[i];
@@ -3735,13 +3815,13 @@ void  SystEq::HeuristicStep(double h,double perc1,double perc2,double Max_Time,b
 			{
 				tmpval[i]=0.0;
 				for (int j=0; j<VEq[i].getSize();j++)// for all components
-						{
+				{
 					double val=0.0;
 					if ((!NotEnable(VEq[i].getIdTrans(j)))&&((val=EnabledTransValueCon[VEq[i].getIdTrans(j)])>0))//if transition is not disable by inhibitor arc
 					{
 						tmpval[i]+=VEq[i].getIncDec(j)*Trans[VEq[i].getIdTrans(j)].rate*val;
 					}
-						}
+				}
 
 				double increment=fabs(ValuePrv[i]-tmpval[i])/(ValuePrv[i]==0?1:ValuePrv[i]);
 				//cout<<increment<<endl;
@@ -3855,7 +3935,7 @@ void SystEq::InsertTran(int num, struct InfTr T){
 	}
 
 
-    it=T.Places.begin();
+	it=T.Places.begin();
 	while(it!=T.Places.end())
 	{
 		Trans[num].Places.push_back(*it);

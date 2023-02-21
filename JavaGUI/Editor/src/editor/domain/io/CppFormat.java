@@ -50,7 +50,7 @@ public class CppFormat {
                     if (!double_constant_log.isEmpty()) {
 
                         if (fluxBalance) {
-                            
+
                             out.println("double " + trn.getUniqueName() + "_general(double *Value,\n"
                                     + "                   vector<class FBGLPK::LPprob>& vec_fluxb,\n"
                                     + "                         map <string,int>& NumTrans,\n"
@@ -60,17 +60,15 @@ public class CppFormat {
                                     + "                         const int T,\n"
                                     + "                         const double& time) {\n");
 
-                        } else if(branchFlag) {
-                             
-                            out.println("vector<double> " + trn.getUniqueName() + "_general(double *Value,\n"
-                                    + "                         map <string,int>& NumTrans,\n"
-                                    + "                         map <string,int>& NumPlaces,\n"
-                                    + "                         const vector<string> & NameTrans,\n"
-                                    + "                         const struct InfTr* Trans,\n"
-                                    + "                         const int T,\n"
-                                    + "                         const double& time) {\n");
-                            
-                            
+                            if (trn.isGeneral()) {
+                                String[] splitted = cppDelayExpr.split("\n");
+                                out.println("   " + splitted[0]);
+                                out.println("   double rate = " + splitted[1] + ";");
+
+                            } else {
+                                out.println("   double rate = " + cppDelayExpr + ";");
+                            }
+
                         } else {
 
                             out.println("double " + trn.getUniqueName() + "_general(double *Value,\n"
@@ -80,16 +78,17 @@ public class CppFormat {
                                     + "                         const struct InfTr* Trans,\n"
                                     + "                         const int T,\n"
                                     + "                         const double& time) {\n");
+
+                            if (trn.isGeneral()) {
+                                String[] splitted = cppDelayExpr.split("\n");
+                                out.println("   " + splitted[0]);
+                                out.println("   double rate = " + splitted[1] + ";");
+
+                            } else {
+                                out.println("   double rate = " + cppDelayExpr + ";");
+                            }
                         }
 
-                        if (trn.isGeneral()) {
-                            String[] splitted = cppDelayExpr.split("\n");
-                            out.println("   " + splitted[0]);
-                            out.println("   double rate = " + splitted[1] + ";");
-
-                        } else {
-                            out.println("   double rate = " + cppDelayExpr + ";");
-                        }
                         out.println("   return (rate);");
                         out.println("}\n");
                     }

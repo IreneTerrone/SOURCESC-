@@ -66,10 +66,6 @@ public class CppCommand {
                 fluxBalanceFlag = true;
                 System.out.println("Enabling flux balance.");
             }
-            if(args[i].equals("-branch")){
-              branchFlag = true;
-              System.out.println("Enabling embedding simulation.");
-            }
             else {
                 System.err.println("Unknown argument: "+args[i]);
                 System.exit(1);

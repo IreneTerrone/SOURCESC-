@@ -80,7 +80,6 @@ case "$1" in
     -H)
     if [ $# -gt 1 ]
     then
-    	FLUXFLAG=true
         FLUXNAMEFILE+=("-H $2")
     else
         printf "**ERROR** You must specify a legal FLUX Balance file path after -H. \n\n"
@@ -144,17 +143,11 @@ echo ${FLUXNAMEFILE[@]}
 
 echo "Compiling general transition file"
 
-if [ "$FLUXFLAG" == "true" ]
+if [[ ${#FLUXNAMEFILE[@]} > 0 ]]
 then
 	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp -flux
-	
-elif [ "$BRANCHFLAG" == "true" ]
-then
-	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp -branch
-	
 else
 	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp
-
 fi
 
 CFUN_PATH=$(perl -e "use File::Spec; print(File::Spec->rel2abs(\"./gen_tran_out.cpp\"),\"\n\")")		
@@ -188,7 +181,7 @@ PNE2ODEreturn=$?
 fi
 echo
 
-if [ $PNE2ODEreturn -ne 0 ]
+if [ $PNE2ODEreturn -ne "0" ]
 then
 	 echo "Solution failed in module PN2ODE"
 	 exit 1
@@ -287,6 +280,9 @@ echo
   	if [[ ${#FLUXNAMEFILE[@]} > 0 ]]
   	then
   		make fluxb
+  	elif [ "$BRANCHFLAG" == "true" ]
+  	then
+  		make embedding
   	else
    		make  normal
    	fi

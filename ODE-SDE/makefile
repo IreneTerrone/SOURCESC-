@@ -29,6 +29,9 @@ normal:	$(name_file).cpp ./class.cpp  ./lsode.cpp ./readSupport.cpp
 	 
 fluxb:	$(name_file).cpp ./class.cpp  ./lsode.cpp ./GLPKsolve.cpp ./general.cpp ./readSupport.cpp
 	 $(C++) -D CGLPK -I./  -o  $(name_file).solver  $(name_file).cpp  ./class.cpp  ./lsode.cpp ./GLPKsolve.cpp ./general.cpp ./readSupport.cpp $(OPTION) $(OPTIONW) $(OPTIONGLPK)
+	 
+embedding: $(name_file).cpp ./class.cpp  ./lsode.cpp ./readSupport.cpp
+	 $(C++) -D EMBEDDING -I./  -o  $(name_file).solver  $(name_file).cpp  ./class.cpp  ./lsode.cpp ./readSupport.cpp  $(OPTION) $(OPTIONW)
 	 	 
 doc:
 	doxygen  DoxyFile
