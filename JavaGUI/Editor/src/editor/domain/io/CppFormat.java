@@ -69,7 +69,8 @@ public class CppFormat {
                                 out.println("   double rate = " + cppDelayExpr + ";");
                             }
 
-                        } else {
+                        } 
+                        else {
 
                             out.println("double " + trn.getUniqueName() + "_general(double *Value,\n"
                                     + "                         map <string,int>& NumTrans,\n"

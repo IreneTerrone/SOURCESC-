@@ -66,6 +66,9 @@ public class CppCommand {
                 fluxBalanceFlag = true;
                 System.out.println("Enabling flux balance.");
             }
+            if(args[i].equals("-branch")){
+                branchFlag = true;
+            }
             else {
                 System.err.println("Unknown argument: "+args[i]);
                 System.exit(1);

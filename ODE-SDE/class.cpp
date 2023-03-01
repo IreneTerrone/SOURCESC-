@@ -3057,6 +3057,12 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 //		out<<endl;
 	}
 
+
+	/*for(int i=0;i<nPlaces;i++)
+	{
+		cout << i << "indice posto con relativo nome " << NamePlaces[i] << endl;
+	}*/
+
 	cout.precision(16);
 	for(int i=0;i<nPlaces;i++)
 	{
@@ -3433,38 +3439,19 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 /* NAME :  Class SystEq*/
 /* DESCRIPTION : It solves the ODE system using the branching method*/
 /**************************************************************/
-void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Info,double Print_Step,char *argv){
-
+void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int deltaBranch,bool Info,double Print_Step,char *argv){
 
 
 	this-> Max_Run=Max_Run;
 	FinalValueXRun = new double*[nPlaces];
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
-
-	//random gsl number generator
-	/*gsl_rng * r2;
-	gsl_rng_env_setup();
-	const gsl_rng_type * T;
-	T = gsl_rng_default;
-	r2 = gsl_rng_alloc (T);
-	gsl_rng_set(r2, seed);*/
-
-	const gsl_rng_type * T;
-    gsl_rng * r2;     
-    gsl_rng_env_setup();
-    T = gsl_rng_default;
-    r2 = gsl_rng_alloc (T);
-     
+	//MOMENTANEO PER TEST
+	deltaBranch = 0.1;
 	//double tout;
 
-	cout << " OMG ENTRI QUI? E IL DELTA? " << delta << endl;
-
-	if(delta < 0){
-		throw Exception("Delta cannot be minor or equal 0.\n\n");
-	}
-
 	//double ValuePrev[nPlaces] {0.0};
+
 
 	double ValueInit[nPlaces];
 
@@ -3473,8 +3460,6 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 	cout<<endl<<"Seed value: "<<seed;
 
 	ofstream out;
-
-
 	if (Info)
 	{
 		out.open(string(argv)+".trace",ofstream::out);
@@ -3485,9 +3470,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 		out<<"Time";
 
 		for(int i=0;i<nPlaces;i++)
-			out<<" "<<NamePlaces[i];	
-
-//		out<<endl;
+			out<<" "<<NamePlaces[i];		
 	}
 
 	cout.precision(16);
@@ -3531,71 +3514,42 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 				out<<" "<<ValuePrv[j];
 			}
 		}
-		if(Info){
-
+		if(Info){		
 			out<<endl;;
 		}
 
 		double nextTimePoint=itime,tout=Print_Step+itime;
 		//istate=1;
-		double t=MAX_DOUBLE,tmpt=itime;
+		double t=MAX_DOUBLE;
 
 		DerivTAUG = new double[nPlaces];
 
 		while(nextTimePoint<=Max_Time){
 
 			time=nextTimePoint;
-			//getValTranFire();
-			
+			getValTranFire();
 
-		//compute tau. AL POSTO DI COMPUTETAU, GET P CHE MI RESTITUISCE I PARAMETRI DELLA MULTINOMIALE
-
-			nextTimePoint+=delta;
-			if (nextTimePoint>tout){
-				delta=tout-tmpt;
-				nextTimePoint=tout;
-			}
+			nextTimePoint+=deltaBranch;
 
 			//cout<<"Tau: "<< tau<<endl;
 			//cout<<"TIME:"<<nextTimePoint<<endl;
 
-			if(delta==-1){
-				throw Exception("*****Error during the tau computation*****\n\n");
+			if(deltaBranch==-1){
+				throw Exception("*****Delta cannot be negative*****\n\n");
 
 			}
 
-
-			//IL DELTA E' PASSATO COME PARAMETRO E DEVO FARE LA MULTINOMIALE CON IL VETTORE DI DOUBLE E LA
-			//LUNGHEZZA DEL VETTORE DI DOUBLE
-
-
-			for (int i=0;i<nTrans;i++){
-
+			for (int i=0;i<nTrans;i++){//oggi i=1 old
+				//oggi if(EnabledTransValueDis[i]!=0){
 				if(EnabledTransValueDis[i]!=0){
-
-					double total_marking = 0.0;
-
-					for (unsigned int k=0; k<Trans[i].InPlaces.size(); k++)//for all variables in the components
-					{
-						total_marking += Value[i];
+					//oggi std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
+					if (Trans[i].GenFun==""){
+						//std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
+						firing[i]=Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,t,time);
 					}
-
-					std::array<double, 2> a_b = Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
-					vector<double> p = getP(a_b[0], a_b[1], delta);
-					if(p.empty()){
-						firing[i]=0;
+					else{
+						throw Exception("*****With branch solver you must define a function to every transition*****\n\n");
 					}
-					else {
-						//tenere d'occhio se si spracca tutto. In teoria nel vector gli elementi sono tenuti
-						// consecutivi quindi questo dovrebbe bastare a convertirlo in array
-						double* p_arr = &p[0];
-						int size = p.size();
-						unsigned int mult_op[size];
-						gsl_ran_multinomial(r2, size, total_marking, p_arr, mult_op);
-						//marcatura fittizia, dovrò fare il prodotto scalare dell'array della multinomiale restituito 
-						//per definire la nuova marcatura
-						firing[i]=4;
-					}	
 				}
 				else
 					firing[i]=0;//oggi
@@ -3609,107 +3563,46 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 				double tmpvalSIM=0.0;
 				for(int j=0; j<VEq[i].getSize();j++)//for all components
 				{
-					//if(!NotEnable(VEq[i].getIdTrans(j)))
-					//{
-					//	tmpvalSIM+=VEq[i].getIncDec(j)*firing[VEq[i].getIdTrans(j)];
-					//}
-					
 					if(firing[VEq[i].getIdTrans(j)]!=0)
 					{
 						tmpvalSIM+=VEq[i].getIncDec(j)*firing[VEq[i].getIdTrans(j)];
 					}
 
-				}//for all components
+				}
 
-
+				//for all components
 				Value[i]=ValuePrv[i]+tmpvalSIM;
 				i=VEq[i].getNext();
 
-
-
 			}
-                derived();//it derives all the rest of places
-                t=MAX_DOUBLE;
-                for(int j=0;j<=nPlaces;j++){
-                	ValuePrv[j]=Value[j];
-                }
+			t=MAX_DOUBLE;
+			for(int j=0;j<=nPlaces;j++){
+				ValuePrv[j]=Value[j];
+			}
 				//tmpt=t;
-                if(tout==nextTimePoint){
-                	if(Info){
+			if(tout==nextTimePoint){
+				if(Info){
 
-                		out<<endl<<nextTimePoint;
-                		for(int j=0; j<nPlaces;j++){
+					out<<endl<<nextTimePoint;
+					for(int j=0; j<nPlaces;j++){
 
-                			out<<" "<<Value[j];
-                		}
-#ifdef CGLPK
-                		for (unsigned int i=0;i<vec_fluxb.size();++i){
-                			outflux[i]<<endl<<tout<<" ";
-                			vec_fluxb[i].printObject(outflux[i]);
-                			vec_fluxb[i].printValue(outflux[i]);
-                			if (Variability){
-                				vec_fluxb[i].printLowerMax(outflux[i]);	
-                			}
-                		}
-#endif						
+						out<<" "<<Value[j];
+					}					
 //					out<<endl;
-                	}
-                	tout+=Print_Step;
-                }
-                tmpt=nextTimePoint;
+				}
+				tout+=Print_Step;
+			}
+		}
 
-            }
+		for (int i=0;i<nPlaces;i++)
+		{
+			Mean[i]+=FinalValueXRun[i][run]=Value[i];
+		}
 
-            for (int i=0;i<nPlaces;i++)
-            {
-            	Mean[i]+=FinalValueXRun[i][run]=Value[i];
-            }
+		++run;
 
-            ++run;
-
-        }
-
-    gsl_rng_free (r2);
-
-    }
-
-/***************************************************************/
-/* NAME :  Class SystEq*/
-/* DESCRIPTION : It estimates the integration step for Euler method*/
-/**************************************************************/
-
-
-    vector<double> SystEq::getP(double A, double B, double delta){
-
-    	if(A==0 && B ==0){
-    		return {};
-    	}
-
-    	double lambda = A - B;
-    	double alpha = (B*exp(lambda*delta)-B)/(A*exp(lambda*delta)-B);
-    	double beta=(A*exp(lambda*delta)-A)/(A*exp(lambda*delta)-B);
-
-    	vector<double> P(100, 0.0);
-  	//double P[100];
-	//P.fill(0.0);
-    	double sum_p = alpha;
-    	P[0] = alpha;
-    	int p_max = 0;
-    	for(std::size_t i = 1; i<100; i++){
-    		if(sum_p<0.99999999){
-    			P[i] = (1-alpha)*(1-beta)*pow(beta, i-1);
-    			sum_p=sum_p+P[i];
-    			p_max++;
-    		}
-    	}
-    	vector<double> P_new(P.begin(), P.end() - p_max);
-	//double P_new[p_max];
-	//std::copy(P.begin(), P.end() - p_max);
-    	int acc = std::accumulate(P_new.begin(),P_new.end()-1,0);
-    	P[p_max]=1-acc+P[p_max];
-    	return P_new;
-
-    }
+	}
+}
 
 
 
@@ -3721,50 +3614,50 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int delta,bool Inf
 /* DESCRIPTION : It estimates the integration step for Euler method*/
 /**************************************************************/
 
-    void  SystEq::HeuristicStep(double h,double perc1,double perc2,double Max_Time,bool Info,double Print_Step,char *argv){
+void  SystEq::HeuristicStep(double h,double perc1,double perc2,double Max_Time,bool Info,double Print_Step,char *argv){
 
 	//assign factor for step
-    	double tmpval[nPlaces];
-    	this->fh=h;
-    	this->perc1=perc1;
-    	this->perc2=perc2;
-    	this->Max_Run=1;
+	double tmpval[nPlaces];
+	this->fh=h;
+	this->perc1=perc1;
+	this->perc2=perc2;
+	this->Max_Run=1;
 	//For statistic
-    	FinalValueXRun=new  double*[nPlaces];
-    	double* ValueInit=(double*)malloc(sizeof(double)*nPlaces);
+	FinalValueXRun=new  double*[nPlaces];
+	double* ValueInit=(double*)malloc(sizeof(double)*nPlaces);
 
-    	for (int i=0;i<nPlaces;i++)
-    	{
-    		FinalValueXRun[i]=new double[Max_Run+1];
-    		ValueInit[i]=Value[i];
-    		for (int j=0;j<Max_Run+1;j++)
-    			FinalValueXRun[i][j]=0.0;
-    	}
+	for (int i=0;i<nPlaces;i++)
+	{
+		FinalValueXRun[i]=new double[Max_Run+1];
+		ValueInit[i]=Value[i];
+		for (int j=0;j<Max_Run+1;j++)
+			FinalValueXRun[i][j]=0.0;
+	}
 
 
-    	double NextPrintTime=itime;
-    	ofstream out;
+	double NextPrintTime=itime;
+	ofstream out;
 
-    	if (Info)
-    	{
-    		out.open(string(argv)+".trace",ofstream::out);
-    		out.precision(16);
-    		if(!out)
-    		{
-    			throw Exception("*****Error opening output file *****\n\n");
+	if (Info)
+	{
+		out.open(string(argv)+".trace",ofstream::out);
+		out.precision(16);
+		if(!out)
+		{
+			throw Exception("*****Error opening output file *****\n\n");
 
-    		}
-    	}
-    	cout.precision(16);
-    	double Max_error;
-    	double eT=perc2;
-    	int MaxIter=20;
-    	int Iter=0;
-    	do
-    	{
-    		cout<<"Euler Step: "<<this->perc1<<endl;
-    		Max_error=-1;
-    		time=itime;
+		}
+	}
+	cout.precision(16);
+	double Max_error;
+	double eT=perc2;
+	int MaxIter=20;
+	int Iter=0;
+	do
+	{
+		cout<<"Euler Step: "<<this->perc1<<endl;
+		Max_error=-1;
+		time=itime;
 		for (int i=0;(i<nPlaces);i++)//return to the initial state
 		{
 			Value[i]=ValueInit[i];
