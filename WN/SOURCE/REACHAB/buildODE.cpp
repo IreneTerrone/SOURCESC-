@@ -464,7 +464,7 @@ else
     out << " std::cerr<<\"\\n\\t -stime <double>:\\t Double number used to set the step in the output. Default: 0.0 (no output)\";\n\t";
     out << " std::cerr<<\"\\n\\t -itime <double>:\\t Double number used to set the initial simulation time. Default: 0.0 \";\n\t";
     out << " std::cerr<<\"\\n\\t -b <bound_file>:\\t Soft bound are defined in the file <bound_file>\";\n\t";
-    out << " std::cerr<<\"\\n\\t -deltaBranch <double>:\\t Delta used for the embedding simulation \";\n\t";
+    out << " std::cerr<<\"\\n\\t -deltaEmb <double>:\\t Delta used for the embedding simulation \";\n\t";
     out << " std::cerr<<\"\\n\\t -seed <double>:\\t Seed of random number generator\";\n\t";
     //variability 
     if (FLUXB){
@@ -621,11 +621,11 @@ out<<"\t\t continue;\n";
 out<<"\t }\n";
 
 //Delta for embedding simulation
-out<<"\t if (strcmp(\"-delta\", argv[ii])==0){\n";
+out<<"\t if (strcmp(\"-deltaEmb\", argv[ii])==0){\n";
 out<<"\t\t if (++ii<argc){\n";
-out<<"\t\t\t delta=atof(argv[ii]);\n\t\t }\n";
+out<<"\t\t\t deltaBranch=atof(argv[ii]);\n\t\t }\n";
 out<<"\t\t else{\n";
-out<< "\t\t\t std::cerr<<\"\\nError:  -delta  <value>\\n\";\n\t\t\t exit(EXIT_FAILURE);\n\t\t }\n";
+out<< "\t\t\t std::cerr<<\"\\nError:  -deltaEmb  <value>\\n\";\n\t\t\t exit(EXIT_FAILURE);\n\t\t }\n";
 out<<"\t\t continue;\n";
 out<<"\t }\n";
 
@@ -655,7 +655,7 @@ out << " cout<<\"\\tRelative tolerance: \"<<rtolODE<<\"\\n\";\n";
     out << " if (fbound!=\"\") cout<<\"\\tBound file: \"<<fbound<<\"\\n\";\n";
     out << " if (finit!=\"\") cout<<\"\\tInitial marking file: \"<<finit<<\"\\n\";\n";
     out << " if (fparm!=\"\") cout<<\"\\tInitial parameter file: \"<<fparm<<\"\\n\";\n";
-    out << " if (deltaEmb!=1) cout<<\"\\tDelta: \"<<deltaEmb<<\"\\n\";\n";
+    out << " if (deltaEmb!=1) cout<<\"\\tDelta: \"<<deltaBranch<<\"\\n\";\n";
     //Variability
     if (FLUXB){
         out << " if (VARIABILITY) cout<<\"\\tEnable variability analysis.\\n\";\n";
@@ -933,7 +933,7 @@ for (pp = 0; pp < npl; pp++)
 
 
 
-    out << "\n\tif (SOLVE == 1)\n\t\t se.SolveODEEuler(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t else\n\t\t if (SOLVE == 0)\n\t\t\t se.SolveSDEEuler(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t else \n\t\t\tif (SOLVE == 3)\n\t\t\t\t se.SolveSSA(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]); \n\t\t\t else \n\t\t\t\t if (SOLVE == 4)\n\t\t\t\t\t  se.HeuristicStep(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 5)\n\t\t\t\t\t  se.SolveODERKF(hini,atolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\tif (SOLVE == 6)\n\t\t\t\t\t\t se.SolveODE45(hini,atolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 8)\n\t\t\t\t\t\t\t se.SolveHLSODE(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t\t\t\t else \n\t\t\t\t\t\t\t if (SOLVE == 7) \n\t\t\t\t\t\t\t\t se.SolveLSODE(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t\t\t\t else \n\t\t\t\t\t\t\t\t if (SOLVE == 10)  \n\t\t\t\t\t\t\t\t se.SolveBranchingMethod(ftime,runs,delta,OUTPUT,stime,argv[1]); \n\t\t\t\t\t\t\t else  \n\t\t\t\t\t\t\t\t se.SolveTAUG(ftime,runs,OUTPUT,stime,argv[1]);";
+    out << "\n\tif (SOLVE == 1)\n\t\t se.SolveODEEuler(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t else\n\t\t if (SOLVE == 0)\n\t\t\t se.SolveSDEEuler(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t else \n\t\t\tif (SOLVE == 3)\n\t\t\t\t se.SolveSSA(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]); \n\t\t\t else \n\t\t\t\t if (SOLVE == 4)\n\t\t\t\t\t  se.HeuristicStep(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 5)\n\t\t\t\t\t  se.SolveODERKF(hini,atolODE,ftime,OUTPUT,stime,argv[1]);   \n\t\t\t\t else\n\t\t\t\t\tif (SOLVE == 6)\n\t\t\t\t\t\t se.SolveODE45(hini,atolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t else\n\t\t\t\t\t if (SOLVE == 8)\n\t\t\t\t\t\t\t se.SolveHLSODE(hini,atolODE,rtolODE,ftime,runs,OUTPUT,stime,argv[1]);\n\t\t\t\t\t else \n\t\t\t\t\t\t\t if (SOLVE == 7) \n\t\t\t\t\t\t\t\t se.SolveLSODE(hini,atolODE,rtolODE,ftime,OUTPUT,stime,argv[1]);\n\t\t\t\t\t\t\t else \n\t\t\t\t\t\t\t\t if (SOLVE == 10)  \n\t\t\t\t\t\t\t\t se.SolveBranchingMethod(ftime,runs,deltaBranch,OUTPUT,stime,argv[1]); \n\t\t\t\t\t\t\t else  \n\t\t\t\t\t\t\t\t se.SolveTAUG(ftime,runs,OUTPUT,stime,argv[1]);";
     out << "\n\tse.PrintStatistic(argv[1]);\n\t}\n catch(Exception obj)\n\t{\n\tcerr<<endl<<obj.get()<<endl;\n\t}\n\n";
     out << " time(&time_4);\n\n cout<<\"\\n\\nEND EXECUTION\"<<endl;\n cout<<\"\\nResults are saved in: \"<<argv[1]<<endl;\n";
     out << " cout<<\"\\n=========================== TIME ===========================\\n\\n\\t\";\n";
@@ -1119,7 +1119,7 @@ for (pp = 0; pp < npl; pp++)
     }
     //variability
     out << " std::string fbound=\"\", finit=\"\", fparm=\"\";\n";
-    out << " double hini = 1e-6, atolODE = 1e-6, rtolODE=1e-6, ftime=1.0, stime=0.0, itime=0.0, epsTAU=0.1, deltaBranch=1.1;\n\n";
+    out << " double hini = 1e-6, atolODE = 1e-6, rtolODE=1e-6, ftime=1.0, stime=0.0, itime=0.0, epsTAU=0.1, deltaBranch=1.0;\n\n";
     out << " cout<<\"\\n\\n =========================================================\\n\";\n";
     out << " cout<<\"|                ODE/SDE Solver                       |\\n\";\n";
     out << " cout<<\" =========================================================\\n\";\n";
@@ -1305,11 +1305,11 @@ for (pp = 0; pp < npl; pp++)
     out<<"\t }\n";
 
     //Delta for embedding simulation
-    out<<"\t if (strcmp(\"-deltaBranch\", argv[ii])==0){\n";
+    out<<"\t if (strcmp(\"-deltaEmb\", argv[ii])==0){\n";
     out<<"\t\t if (++ii<argc){\n";
     out<<"\t\t\t deltaBranch=atof(argv[ii]);\n\t\t }\n";
     out<<"\t\t else{\n";
-    out<< "\t\t\t std::cerr<<\"\\nError:  -deltaBranch  <value>\\n\";\n\t\t\t exit(EXIT_FAILURE);\n\t\t }\n";
+    out<< "\t\t\t std::cerr<<\"\\nError:  -deltaEmb  <value>\\n\";\n\t\t\t exit(EXIT_FAILURE);\n\t\t }\n";
     out<<"\t\t continue;\n";
     out<<"\t }\n";
 

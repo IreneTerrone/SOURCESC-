@@ -3058,10 +3058,10 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 	}
 
 
-	/*for(int i=0;i<nPlaces;i++)
+	for(int i=0;i<nPlaces;i++)
 	{
 		cout << i << "indice posto con relativo nome " << NamePlaces[i] << endl;
-	}*/
+	}
 
 	cout.precision(16);
 	for(int i=0;i<nPlaces;i++)
@@ -3439,25 +3439,20 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 /* NAME :  Class SystEq*/
 /* DESCRIPTION : It solves the ODE system using the branching method*/
 /**************************************************************/
-void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int deltaBranch,bool Info,double Print_Step,char *argv){
+void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch,bool Info,double Print_Step,char *argv){
 
 
 	this-> Max_Run=Max_Run;
 	FinalValueXRun = new double*[nPlaces];
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
-	//MOMENTANEO PER TEST
-	deltaBranch = 0.1;
-	//double tout;
-
-	//double ValuePrev[nPlaces] {0.0};
-
+	//int i = 0;
 
 	double ValueInit[nPlaces];
 
 	int firing[nTrans];
 	std::fill(firing, firing + nTrans, 0);
-	cout<<endl<<"Seed value: "<<seed;
+	cout<<endl<<"Seed value: "<<seed << endl;
 
 	ofstream out;
 	if (Info)
@@ -3520,19 +3515,26 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int deltaBranch,bo
 
 		double nextTimePoint=itime,tout=Print_Step+itime;
 		//istate=1;
-		double t=MAX_DOUBLE;
 
 		DerivTAUG = new double[nPlaces];
 
 		while(nextTimePoint<=Max_Time){
 
+
+			/*i++;
+			cout << i << endl;
+			if(i>1){
+				cout << "ma qui entriiii" << endl;
+				break;
+			}*/
+
 			time=nextTimePoint;
 			getValTranFire();
 
-			nextTimePoint+=deltaBranch;
+			nextTimePoint = nextTimePoint + deltaBranch;
 
-			//cout<<"Tau: "<< tau<<endl;
-			//cout<<"TIME:"<<nextTimePoint<<endl;
+
+			//cout << nextTimePoint << " next time point " << endl;
 
 			if(deltaBranch==-1){
 				throw Exception("*****Delta cannot be negative*****\n\n");
@@ -3542,20 +3544,23 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int deltaBranch,bo
 			for (int i=0;i<nTrans;i++){//oggi i=1 old
 				//oggi if(EnabledTransValueDis[i]!=0){
 				if(EnabledTransValueDis[i]!=0){
-					//oggi std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
 					if (Trans[i].GenFun==""){
-						//std::poisson_distribution<>PoisD(tau*EnabledTransValueDis[i]*Trans[i].rate);
-						firing[i]=Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,t,time);
-					}
-					else{
 						throw Exception("*****With branch solver you must define a function to every transition*****\n\n");
 					}
+					else{
+						firing[i]=Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,i,time);
+					}
 				}
-				else
+				else{
 					firing[i]=0;//oggi
+				}
 			//cout<<"Firing: "<<firing[i];
 			}
-			//cout<<endl;
+
+			cout << "inizio firing " << endl; 
+			for(int i = 0; i< nTrans; i++){
+				cout << firing[i] << " firing" << endl;
+			}
 
 			unsigned int i = headDirc;
 			while(i!=DEFAULT)
@@ -3575,11 +3580,9 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int deltaBranch,bo
 				i=VEq[i].getNext();
 
 			}
-			t=MAX_DOUBLE;
 			for(int j=0;j<=nPlaces;j++){
 				ValuePrv[j]=Value[j];
 			}
-				//tmpt=t;
 			if(tout==nextTimePoint){
 				if(Info){
 
@@ -3588,7 +3591,6 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,int deltaBranch,bo
 
 						out<<" "<<Value[j];
 					}					
-//					out<<endl;
 				}
 				tout+=Print_Step;
 			}
