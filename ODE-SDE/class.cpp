@@ -3548,7 +3548,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 						throw Exception("*****With branch solver you must define a function to every transition*****\n\n");
 					}
 					else{
-						firing[i]=Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,i,time);
+						firing[i]=Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,i,deltaBranch);
 					}
 				}
 				else{
@@ -3557,10 +3557,6 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 			//cout<<"Firing: "<<firing[i];
 			}
 
-			cout << "inizio firing " << endl; 
-			for(int i = 0; i< nTrans; i++){
-				cout << firing[i] << " firing" << endl;
-			}
 
 			unsigned int i = headDirc;
 			while(i!=DEFAULT)
