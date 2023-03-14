@@ -5,7 +5,6 @@ static double param_u;
 static double param_v;
 static double param_b;*/
 double param_K = pow(10, 6);
-double deltaBranch = 0.5;
 static vector<double> param_a{1.009, 1.008, 1.009, 1.008};
 static vector<double> param_b{1,1,1,1};
 static vector<double> param_u{3.4*pow(10, -5),3.4*pow(10, -5),3.4*pow(10, -5),3.4*pow(10, -5)};
@@ -52,6 +51,7 @@ void init_data_structures()
   Flag = 1; 
 }*/
 
+
 vector<double> getP(double A, double B, double deltaBranch){
 
   if(A==0 && B ==0){
@@ -91,11 +91,13 @@ vector<double> getP(double A, double B, double deltaBranch){
 
 double getRate(double total_marking, vector<double> p){
 
+  long int seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
   const gsl_rng_type * type;
   gsl_rng * r2;     
   gsl_rng_env_setup();
   type = gsl_rng_default;
   r2 = gsl_rng_alloc (type);
+  gsl_rng_set(r2, seed); // Seed with time
   double rate = 0;
 
   //cout << "entro dentro getRate" << endl;
@@ -147,7 +149,7 @@ double PMutationFunction(double *Value,
  const vector<string> & NameTrans,
  const struct InfTr* Trans,
  const int T,
- const double& time)
+ const double& deltaBranch)
 {
   //if( Flag == -1)   init_data_structures();
   
@@ -173,7 +175,7 @@ double DMutationFunction(double *Value,
  const vector<string> & NameTrans,
  const struct InfTr* Trans,
  const int T,
- const double& time)
+ const double& deltaBranch)
 {
   //if( Flag == -1)   init_data_structures();
   
@@ -214,7 +216,7 @@ double GrowthFunction(double *Value,
  const vector<string> & NameTrans,
  const struct InfTr* Trans,
  const int T,
- const double& time)
+ const double& deltaBranch)
 {
   //if( Flag == -1)   init_data_structures();
 

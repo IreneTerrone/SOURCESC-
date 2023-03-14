@@ -3446,9 +3446,12 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 	FinalValueXRun = new double*[nPlaces];
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
-	//int i = 0;
 
 	double ValueInit[nPlaces];
+
+	for (int j=0;j<nPlaces;j++){
+		cout << Value[j] << endl;
+	}
 
 	int firing[nTrans];
 	std::fill(firing, firing + nTrans, 0);
@@ -3513,20 +3516,15 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 			out<<endl;;
 		}
 
+		cout << run << " runs " << endl;
+
+
 		double nextTimePoint=itime,tout=Print_Step+itime;
 		//istate=1;
 
 		DerivTAUG = new double[nPlaces];
 
 		while(nextTimePoint<=Max_Time){
-
-
-			/*i++;
-			cout << i << endl;
-			if(i>1){
-				cout << "ma qui entriiii" << endl;
-				break;
-			}*/
 
 			time=nextTimePoint;
 			getValTranFire();
@@ -3549,6 +3547,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 					}
 					else{
 						firing[i]=Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,i,deltaBranch);
+						//cout << firing[i] << " firing " << endl;
 					}
 				}
 				else{
