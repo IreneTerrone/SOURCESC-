@@ -41,6 +41,9 @@ namespace SDE {
 //long int seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
 
 std::mt19937_64 generator;//(seed);
+//SEED GLOBALE TEMPORANEO 
+gsl_rng * rng;
+
 std::normal_distribution<double> distribution;//(0.0,1.0);
 
 
@@ -504,6 +507,11 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
     		this->seed=seed;
 
     	generator.seed(this->seed);
+
+    	//DEFINITO GLOBALE TEMPORANEAMENTE
+    	rng = gsl_rng_alloc(gsl_rng_mt19937);
+    	gsl_rng_set(rng, this->seed); // Seed with time
+
     	distribution.param(std::normal_distribution<double>::param_type(0.0, 1.0));
     //distribution=&std::normal_distribution<double> (0.0,1.0);
    // =std::mt19937_64 generator(seed);
@@ -528,6 +536,7 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
     	free(EnabledTransValueCon);
     	free(EnabledTransValueDis);
     	free(TransRate);
+    	gsl_rng_free (rng);
     	if (FinalValueXRun!=nullptr)
     	{
     		for(int i=0;i<nPlaces;i++)
@@ -3449,10 +3458,6 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 
 	double ValueInit[nPlaces];
 
-	for (int j=0;j<nPlaces;j++){
-		cout << Value[j] << endl;
-	}
-
 	int firing[nTrans];
 	std::fill(firing, firing + nTrans, 0);
 	cout<<endl<<"Seed value: "<<seed << endl;
@@ -3516,13 +3521,12 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 			out<<endl;;
 		}
 
-		cout << run << " runs " << endl;
+		//cout << run << " runs " << endl;
 
 
 		double nextTimePoint=itime,tout=Print_Step+itime;
 		//istate=1;
 
-		DerivTAUG = new double[nPlaces];
 
 		while(nextTimePoint<=Max_Time){
 
@@ -3531,16 +3535,12 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 
 			nextTimePoint = nextTimePoint + deltaBranch;
 
-
-			//cout << nextTimePoint << " next time point " << endl;
-
 			if(deltaBranch==-1){
 				throw Exception("*****Delta cannot be negative*****\n\n");
 
 			}
 
 			for (int i=0;i<nTrans;i++){//oggi i=1 old
-				//oggi if(EnabledTransValueDis[i]!=0){
 				if(EnabledTransValueDis[i]!=0){
 					if (Trans[i].GenFun==""){
 						throw Exception("*****With branch solver you must define a function to every transition*****\n\n");
@@ -3553,7 +3553,6 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 				else{
 					firing[i]=0;//oggi
 				}
-			//cout<<"Firing: "<<firing[i];
 			}
 
 
@@ -3575,9 +3574,12 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 				i=VEq[i].getNext();
 
 			}
-			for(int j=0;j<=nPlaces;j++){
+
+
+			for(int j=0;j<nPlaces;j++){
 				ValuePrv[j]=Value[j];
 			}
+
 			if(tout==nextTimePoint){
 				if(Info){
 

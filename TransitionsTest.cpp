@@ -4,6 +4,7 @@
 static double param_u;
 static double param_v;
 static double param_b;*/
+#define MAX_SUM 0.99999999
 double param_K = pow(10, 6);
 static vector<double> param_a{1.009, 1.008, 1.009, 1.008};
 static vector<double> param_b{1,1,1,1};
@@ -64,52 +65,34 @@ vector<double> getP(double A, double B, double deltaBranch){
 
 
   vector<double> P(100, 0.0);
+  //double P[nPlaces];
+  //std::fill(P, P + 100, 0.0);
   double sum_p = alpha;
   P[0] = alpha;
   int p_max = 1;
-  for(size_t i = 1; i<100; i++){
-    if(sum_p<0.99999999){
-      P[i] = (1-alpha)*(1-beta)*pow(beta, i-1);
-      sum_p=sum_p+P[i];
-      p_max++;
-    }
+  for(; p_max<100 && sum_p<MAX_SUM; p_max++){
+    P[p_max] = (1-alpha)*(1-beta)*pow(beta, p_max-1);
+    sum_p=sum_p+P[p_max];
   }
-  //cout << "p_max " << p_max << endl;
   auto last_element = P.begin() + p_max -1;
+  //double last_element = P[p_max-1];
   vector<double> P_new(P.begin(), last_element);
-  //cout << "lunghezza di P_new " << P_new.size() << endl;
   double acc = std::accumulate(P.begin(),last_element,0.0);
   P_new.push_back(1-acc);
-  //double sum = 0;
-  //for(int i = 0; i<P_new.size(); i++){
-    //sum+= P_new[i];
-  //}
-  //cout << "sto uscendo da getP e sum vale " << sum << endl;
+  cout << 1-acc << "calcolato con l'accumulate " << endl;
   return P_new;
 
 }
 
 double getRate(double total_marking, vector<double> p){
 
-  long int seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-  const gsl_rng_type * type;
-  gsl_rng * r2;     
-  gsl_rng_env_setup();
-  type = gsl_rng_default;
-  r2 = gsl_rng_alloc (type);
-  gsl_rng_set(r2, seed); // Seed with time
   double rate = 0;
 
-  //cout << "entro dentro getRate" << endl;
-
   if(!p.empty()){
-    //tenere d'occhio se si spracca tutto. In teoria nel vector gli elementi sono tenuti
-    // consecutivi quindi questo dovrebbe bastare a convertirlo in array
     double* p_arr = &p[0];
     int size = p.size();
-    //cout << "size: " << size << endl;
     unsigned int mult_op[size];
-    gsl_ran_multinomial(r2, size, total_marking, p_arr, mult_op);
+    gsl_ran_multinomial(rng, size, total_marking, p_arr, mult_op);
     double mult = -1;
 
 
@@ -118,9 +101,6 @@ double getRate(double total_marking, vector<double> p){
       mult++;
     }
   }
-
-  gsl_rng_free (r2);
-  //cout << "sto uscendo da getRate con rate " << rate << endl;
 
   return rate; 
 
@@ -133,12 +113,11 @@ double getV(double *Value,
  int index_place,
  const int T)
 {
-  //if( Flag == -1)   init_data_structures();
-  
+
   double x = Value[Trans[T].InPlaces[0].Id];
   
   double v = param_v[Trans[T].InPlaces[0].Id] * ( 1 - x / param_K );
-    
+
   return v;
 }
 
@@ -152,12 +131,11 @@ double PMutationFunction(double *Value,
  const double& deltaBranch)
 {
   //if( Flag == -1)   init_data_structures();
-  
+
   double total_marking = Value[Trans[T].InPlaces[0].Id];
   
   double v = param_v[Trans[T].InPlaces[0].Id] * ( 1 - total_marking / param_K );
   
-  //std::array<double, 2> rate = {v,0};
   double rate = 0;
 
   vector<double> p = getP(v, 0,  deltaBranch);
@@ -178,7 +156,7 @@ double DMutationFunction(double *Value,
  const double& deltaBranch)
 {
   //if( Flag == -1)   init_data_structures();
-  
+
   double total_marking = Value[Trans[T].InPlaces[0].Id];
   
   double u = param_u[Trans[T].InPlaces[0].Id] * ( 1 - total_marking / param_K );
@@ -199,7 +177,7 @@ double getU(double *Value,
  const int T)
 {
   //if( Flag == -1)   init_data_structures();
-  
+
   double total_marking = Value[Trans[T].InPlaces[0].Id];
   
   double u = param_u[Trans[T].InPlaces[0].Id] * ( 1 - total_marking / param_K );
