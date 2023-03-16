@@ -10,6 +10,12 @@ static vector<double> param_a{1.009, 1.008, 1.009, 1.008};
 static vector<double> param_b{1,1,1,1};
 static vector<double> param_u{3.4*pow(10, -5),3.4*pow(10, -5),3.4*pow(10, -5),3.4*pow(10, -5)};
 static vector<double> param_v{0.016,0.016,0.016,0.016};
+static vector<double> P_M(100, 0.0);
+static vector<double> P_D(100, 0.0);
+static vector<double> P_G(100, 0.0);
+
+
+
 
 
 
@@ -53,10 +59,12 @@ void init_data_structures()
 }*/
 
 
-vector<double> getP(double A, double B, double deltaBranch){
+void getP(double A, double B, double deltaBranch, vector<double>& P){
 
   if(A==0 && B ==0){
-    return {};
+    cout << "qui entri mai?" << endl;
+    P[0] = -2;
+    return;
   }
 
   double lambda = A - B;
@@ -64,43 +72,47 @@ vector<double> getP(double A, double B, double deltaBranch){
   double beta=(A*exp(lambda*deltaBranch)-A)/(A*exp(lambda*deltaBranch)-B);
 
 
-  vector<double> P(100, 0.0);
-  //double P[nPlaces];
-  //std::fill(P, P + 100, 0.0);
   double sum_p = alpha;
   P[0] = alpha;
+  //cout << P[0] << " valore di P[0]" << endl;
   int p_max = 1;
   for(; p_max<100 && sum_p<MAX_SUM; p_max++){
     P[p_max] = (1-alpha)*(1-beta)*pow(beta, p_max-1);
+    //cout << P[p_max] << " valore di P[p_max]" << endl;
     sum_p=sum_p+P[p_max];
   }
-  auto last_element = P.begin() + p_max -1;
+
+  //cout << "qui esci dopo P " << endl;
+
+  //auto last_element = P.begin() + p_max;
   //double last_element = P[p_max-1];
-  vector<double> P_new(P.begin(), last_element);
-  double acc = std::accumulate(P.begin(),last_element,0.0);
-  P_new.push_back(1-acc);
-  cout << 1-acc << "calcolato con l'accumulate " << endl;
-  return P_new;
+  //vector<double> P_new(P.begin(), last_element);
+  //return P_new;
 
 }
 
-double getRate(double total_marking, vector<double> p){
+double getRate(double total_marking, vector<double>& p){
 
   double rate = 0;
 
-  if(!p.empty()){
+  if(p[0] != -2){
     double* p_arr = &p[0];
     int size = p.size();
     unsigned int mult_op[size];
     gsl_ran_multinomial(rng, size, total_marking, p_arr, mult_op);
     double mult = -1;
 
-
     for(int i = 0; i<size; i++){
       rate+= mult_op[i] * mult;
       mult++;
     }
   }
+  else{
+    cout << "entri mai nell'else?" << endl;
+  }
+
+   // cout << "qui esci dopo rate" << endl;
+
 
   return rate; 
 
@@ -138,10 +150,13 @@ double PMutationFunction(double *Value,
   
   double rate = 0;
 
-  vector<double> p = getP(v, 0,  deltaBranch);
+  //double* P[100];
 
-  rate = getRate(total_marking, p);
+  //vector<double> *p = getP(v, 0,  deltaBranch, P);
 
+  getP(v, 0,  deltaBranch, P_M);
+
+  rate = getRate(total_marking, P_M);
   
   return rate;
 }
@@ -163,10 +178,12 @@ double DMutationFunction(double *Value,
   
   double rate = 0;
 
-  vector<double> p = getP(u, 0, deltaBranch);
+  //vector<double> *p = getP(u, 0, deltaBranch);
 
+  getP(u, 0,  deltaBranch, P_D);
 
-  rate = getRate(total_marking, p);
+  rate = getRate(total_marking, P_D);
+
   return rate;
 }
 
@@ -210,14 +227,14 @@ double GrowthFunction(double *Value,
   
   double a = uv + (param_a[Trans[T].InPlaces[0].Id] - param_b[Trans[T].InPlaces[0].Id]) * xx;
   double b = uv - (param_a[Trans[T].InPlaces[0].Id] - param_b[Trans[T].InPlaces[0].Id]) * xx;
-  
-  vector<double> p = getP(a, b, deltaBranch);
+ 
+  //vector<double> *p = getP(a, b, deltaBranch);
 
-  double rate = getRate(total_marking, p);
+  getP(a, b, deltaBranch, P_G);
 
+  double rate = getRate(total_marking, P_G);
 
   return rate;
-
 
 }
 
