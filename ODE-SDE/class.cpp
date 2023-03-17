@@ -3506,6 +3506,11 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 			cout<<"\r\t START RUN..."<<run<<" ";
 			cout.flush();
 		}
+
+		//if(Info){		
+		//	out<<endl;
+		//}
+
 		//Initialization for each run
 		if(Info){
 			out<<endl<<itime;
@@ -3517,9 +3522,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 				out<<" "<<ValuePrv[j];
 			}
 		}
-		if(Info){		
-			out<<endl;;
-		}
+
 
 		//cout << run << " runs " << endl;
 
@@ -3534,6 +3537,11 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 			getValTranFire();
 
 			nextTimePoint = nextTimePoint + deltaBranch;
+			if (nextTimePoint>tout){
+				nextTimePoint=tout;
+			}
+
+			//cout << nextTimePoint << " nextTimePoint " << endl;
 
 			if(deltaBranch==-1){
 				throw Exception("*****Delta cannot be negative*****\n\n");
@@ -3591,6 +3599,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 				}
 				tout+=Print_Step;
 			}
+
 		}
 
 		for (int i=0;i<nPlaces;i++)

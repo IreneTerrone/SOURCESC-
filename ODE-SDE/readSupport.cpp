@@ -93,7 +93,7 @@ namespace CRS {
 						}
 					}
 					catch(std::invalid_argument const& ex){
-						cout << "There's an invalid argument" + name_file[file_index] + " (the separator should be the comma)\n";
+						cout << "There's an invalid argument " + name_file[file_index] + " (the separator should be the comma)\n";
 					}
 					if(!init){
 						columnLenght++;
