@@ -257,7 +257,7 @@ inline void SystEqMin::getValTranFire()
 		EnabledTransValueCon[t]=0.0;
 		EnabledTransValueDis[t]=0.0;
 
-		if (Trans[t].FuncT!=nullptr){
+		if (Trans[t].FuncT!=nullptr && solve != Solve_BRANCH){
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
@@ -309,7 +309,7 @@ inline void SystEqMas::getValTranFire()
 	{
 		EnabledTransValueDis[t]=EnabledTransValueCon[t]=1.0;
        // cout<<" T:"<<NameTrans[t]<<endl;
-		if (Trans[t].FuncT!=nullptr){
+		if (Trans[t].FuncT!=nullptr && solve != Solve_BRANCH){
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
@@ -2402,6 +2402,7 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 
 
 	this->Max_Run=0;
+	solve = Solve_LSODE;
 	//For statistic
 	FinalValueXRun=new double*[nPlaces];
 	for (int i=0;i<nPlaces;i++)
@@ -2828,6 +2829,7 @@ double SystEq::getComputeTauGillespie(int SetTran[],double t, double hstep){
 
     	this->Max_Run=Max_Run;
 	//For statistic
+    	solve = Solve_HLSODE;
     	FinalValueXRun=new double*[nPlaces];
     	double Mean[nPlaces];
     	std::fill(Mean, Mean+nPlaces, 0.0);
@@ -3022,6 +3024,7 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
 	double tout;
+	solve = Solve_SSA;
 
 	//double ValuePrev[nPlaces] {0.0};
 
@@ -3064,12 +3067,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 		}	
 #endif
 //		out<<endl;
-	}
-
-
-	for(int i=0;i<nPlaces;i++)
-	{
-		cout << i << "indice posto con relativo nome " << NamePlaces[i] << endl;
 	}
 
 	cout.precision(16);
@@ -3132,8 +3129,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 		double nextTimePoint=tout=Print_Step+itime;
 		//istate=1;
 		time=itime;
-
-
 
 
 		while(time<=Max_Time){
@@ -3204,6 +3199,7 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 	FinalValueXRun = new double*[nPlaces];
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
+	solve = Solve_TAUG;
 	//double tout;
 
 	//double ValuePrev[nPlaces] {0.0};
@@ -3339,7 +3335,6 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 
 			if(tau==-1){
 				throw Exception("*****Error during the tau computation*****\n\n");
-
 			}
 
 			for (int i=0;i<nTrans;i++){//oggi i=1 old
@@ -3384,9 +3379,7 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 					Value[i]=ValuePrv[i]+tmpvalSIM;
 					i=VEq[i].getNext();
 
-
 				}
-
 
 			}
 			if (!neg)
@@ -3398,7 +3391,7 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
             else
             {
             	t=MAX_DOUBLE;
-            	for(int j=0;j<=nPlaces;j++){
+            	for(int j=0;j<nPlaces;j++){
             		ValuePrv[j]=Value[j];
             	}
 				//tmpt=t;
@@ -3455,6 +3448,8 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 	FinalValueXRun = new double*[nPlaces];
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
+	solve = Solve_BRANCH;
+
 
 	double ValueInit[nPlaces];
 
@@ -3530,11 +3525,14 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 		double nextTimePoint=itime,tout=Print_Step+itime;
 		//istate=1;
 
-
+		bool no_end = true;
 		while(nextTimePoint<=Max_Time){
 
 			time=nextTimePoint;
-			getValTranFire();
+
+			if(no_end==true){
+				getValTranFire();
+			}
 
 			nextTimePoint = nextTimePoint + deltaBranch;
 			if (nextTimePoint>tout){
@@ -3548,15 +3546,17 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 
 			}
 
+			no_end = false;
 			for (int i=0;i<nTrans;i++){//oggi i=1 old
 				if(EnabledTransValueDis[i]!=0){
+					no_end = true;
 					if (Trans[i].GenFun==""){
 						throw Exception("*****With branch solver you must define a function to every transition*****\n\n");
 					}
 					else{
 						firing[i]=Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,i,deltaBranch);
-						//cout << firing[i] << " firing " << endl;
 					}
+
 				}
 				else{
 					firing[i]=0;//oggi
@@ -3582,7 +3582,6 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 				i=VEq[i].getNext();
 
 			}
-
 
 			for(int j=0;j<nPlaces;j++){
 				ValuePrv[j]=Value[j];

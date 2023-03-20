@@ -184,6 +184,14 @@ namespace SDE
     //@}
   };
 
+  enum solve_type {
+    Solve_LSODE,
+    Solve_SSA,
+    Solve_HLSODE,
+    Solve_TAUG,
+    Solve_BRANCH
+  };
+
   //! It uses for encoding the place information
   struct InfPlace
   {
@@ -410,6 +418,8 @@ namespace SDE
   int max_attempt {500};
     //!It stores the used seed
   long int seed {0};
+    //!It indicates the solve type used in this execution
+  solve_type solve;
   
 //automaton
 #ifdef AUTOMATON
