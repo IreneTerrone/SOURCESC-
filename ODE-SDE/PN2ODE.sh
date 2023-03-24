@@ -146,6 +146,9 @@ echo "Compiling general transition file"
 if [[ ${#FLUXNAMEFILE[@]} > 0 ]]
 then
 	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp -flux
+elif [ "$BRANCHFLAG" == "true" ]
+then
+	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp -branch
 else
 	java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand $NET_PATH gen_tran_out.cpp
 fi
@@ -173,6 +176,11 @@ then
   
 echo ${GREATSPN_BINDIR}/PN2ODE $NET_PATH $EXPORT_FORMAT $TRANS_POLICY -T $TRANS_PATH -F $FUN_PATH ${FLUXNAMEFILE[@]}
 ${GREATSPN_BINDIR}/PN2ODE $NET_PATH $EXPORT_FORMAT $TRANS_POLICY -T $TRANS_PATH -F $FUN_PATH ${FLUXNAMEFILE[@]}
+PNE2ODEreturn=$?
+elif [ "$BRANCHFLAG" == "true" ]
+then
+echo ${GREATSPN_BINDIR}/PN2ODE $NET_PATH $EXPORT_FORMAT $TRANS_POLICY $AUT $COMPRESS  ${FLUXNAMEFILE[@]}
+${GREATSPN_BINDIR}/PN2ODE $NET_PATH $EXPORT_FORMAT $TRANS_POLICY $AUT $COMPRESS -E  ${FLUXNAMEFILE[@]}
 PNE2ODEreturn=$?
 else
 echo ${GREATSPN_BINDIR}/PN2ODE $NET_PATH $EXPORT_FORMAT $TRANS_POLICY $AUT $COMPRESS  ${FLUXNAMEFILE[@]}

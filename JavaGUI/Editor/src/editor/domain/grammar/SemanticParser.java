@@ -1375,8 +1375,11 @@ public class SemanticParser extends ExprLangBaseVisitor<FormattedFormula> {
                 if (arguments.isEmpty()) {
                     if (context.cppForFluxBalance) {
                         arguments_defined = "Value, vec_fluxb, NumTrans, NumPlaces, NameTrans, Trans, T, time";
-
-                    } else {
+                    }
+                    else if(context.cppForBranching){
+                       arguments_defined = "Value, NumTrans, NumPlaces, NameTrans, Trans, T, time, deltaBranch"; 
+                    }
+                    else {
                         arguments_defined = "Value, NumTrans, NumPlaces, NameTrans, Trans, T, time";
                     }
                 } else {

@@ -257,10 +257,12 @@ inline void SystEqMin::getValTranFire()
 		EnabledTransValueCon[t]=0.0;
 		EnabledTransValueDis[t]=0.0;
 
-		if (Trans[t].FuncT!=nullptr && solve != Solve_BRANCH){
+		if (Trans[t].FuncT!=nullptr){
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+#elif EMBEDDING
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,t,time, delta_branch);
 #else
 			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #endif 
@@ -309,10 +311,12 @@ inline void SystEqMas::getValTranFire()
 	{
 		EnabledTransValueDis[t]=EnabledTransValueCon[t]=1.0;
        // cout<<" T:"<<NameTrans[t]<<endl;
-		if (Trans[t].FuncT!=nullptr && solve != Solve_BRANCH){
+		if (Trans[t].FuncT!=nullptr){
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+#elif EMBEDDING
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,t,time, delta_branch);
 #else
 			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #endif 		
@@ -368,6 +372,8 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+#elif EMBEDDING
+			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,t,time, delta_branch);
 #else
 			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #endif 	
@@ -424,6 +430,8 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
     			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,t,time);
+#elif EMBEDDING
+				EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,t,time, delta_branch);
 #else
     			EnabledTransValueDis[t]=EnabledTransValueCon[t]=Trans[t].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,t,time);
 #endif 	
@@ -2402,7 +2410,6 @@ void SystEq::SolveLSODE(double h,double perc1,double perc2,double Max_Time,bool 
 
 
 	this->Max_Run=0;
-	solve = Solve_LSODE;
 	//For statistic
 	FinalValueXRun=new double*[nPlaces];
 	for (int i=0;i<nPlaces;i++)
@@ -2633,6 +2640,8 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 #ifdef CGLPK
      //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 	double fh = Trans[T].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,T,time);
+#elif EMBEDDING
+			double fh = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,T,time, delta_branch);
 #else
 	double fh = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	
@@ -2643,6 +2652,8 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 	double f2h = Trans[T].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,T,time);
+#elif EMBEDDING
+			double f2h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,T,time, delta_branch);
 #else
 	double f2h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	
@@ -2652,6 +2663,8 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 	double fmh = Trans[T].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,T,time);
+#elif EMBEDDING
+	double fmh = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,T,time, delta_branch);
 #else
 	double fmh = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	
@@ -2662,6 +2675,8 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 	double fm2h = Trans[T].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,T,time);
+#elif EMBEDDING
+	double fm2h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,T,time, delta_branch);
 #else
 	double fm2h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	
@@ -2675,6 +2690,8 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
 	double f4h = Trans[T].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,T,time);
+#elif EMBEDDING
+	double f4h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,T,time, delta_branch);
 #else
 	double f4h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	  
@@ -2683,7 +2700,8 @@ double SystEq::RichardsonExtrap(double *ValuePrv, map <string,int>& NumTrans, ma
 //	double fm4h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #ifdef CGLPK
  //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
-	double fm4h = Trans[T].FuncT(ValuePrv,vec_fluxb,NumTrans,NumPlaces,NameTrans,Trans,T,time);
+#elif EMBEDDING
+	double fm4h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,T,time, delta_branch);
 #else
 	double fm4h = Trans[T].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,T,time);
 #endif 	
@@ -2829,7 +2847,6 @@ double SystEq::getComputeTauGillespie(int SetTran[],double t, double hstep){
 
     	this->Max_Run=Max_Run;
 	//For statistic
-    	solve = Solve_HLSODE;
     	FinalValueXRun=new double*[nPlaces];
     	double Mean[nPlaces];
     	std::fill(Mean, Mean+nPlaces, 0.0);
@@ -3024,7 +3041,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
 	double tout;
-	solve = Solve_SSA;
 
 	//double ValuePrev[nPlaces] {0.0};
 
@@ -3199,7 +3215,6 @@ void SystEq::SolveTAUG(double Max_Time,int Max_Run,bool Info,double Print_Step,c
 	FinalValueXRun = new double*[nPlaces];
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
-	solve = Solve_TAUG;
 	//double tout;
 
 	//double ValuePrev[nPlaces] {0.0};
@@ -3448,8 +3463,7 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 	FinalValueXRun = new double*[nPlaces];
 	double Mean[nPlaces];
 	std::fill(Mean, Mean + nPlaces, 0.0);
-	solve = Solve_BRANCH;
-
+	this -> delta_branch = deltaBranch;
 
 	double ValueInit[nPlaces];
 
@@ -3525,14 +3539,11 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 		double nextTimePoint=itime,tout=Print_Step+itime;
 		//istate=1;
 
-		bool no_end = true;
 		while(nextTimePoint<=Max_Time){
 
 			time=nextTimePoint;
 
-			if(no_end==true){
-				getValTranFire();
-			}
+			getValTranFire();
 
 			nextTimePoint = nextTimePoint + deltaBranch;
 			if (nextTimePoint>tout){
@@ -3546,17 +3557,14 @@ void SystEq::SolveBranchingMethod(double Max_Time,int Max_Run,double deltaBranch
 
 			}
 
-			no_end = false;
 			for (int i=0;i<nTrans;i++){//oggi i=1 old
 				if(EnabledTransValueDis[i]!=0){
-					no_end = true;
 					if (Trans[i].GenFun==""){
 						throw Exception("*****With branch solver you must define a function to every transition*****\n\n");
 					}
 					else{
-						firing[i]=Trans[i].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans, Trans,i,deltaBranch);
+						firing[i]=EnabledTransValueDis[i];
 					}
-
 				}
 				else{
 					firing[i]=0;//oggi

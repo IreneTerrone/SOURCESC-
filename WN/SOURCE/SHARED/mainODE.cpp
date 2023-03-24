@@ -123,6 +123,7 @@ extern "C" {
     bool MASSACTION = false;
     //it is true iff FLUX BALANCE is enable
     bool FLUXB= false;
+    bool EMBEDDING = false;
     std::vector<std::string> flux_names;
     bool MATLAB = false;
     bool AUTOMATON = false;
@@ -1119,7 +1120,7 @@ int initialize(int  argc,  char  *argv[]) {
 
     if (argc < 2) {
 //automaton
-        std::cerr << "\n\nUSE: PN2ODE <path/net_name> [option]\n\tOption:\n\t\t-R ->\tExport R file\n\t\t-M ->\tGenelarized Mass Action policy\n\t\t-I ->\tInfinity servers policy (default)\n\t\t-O ->\tExport in Matlab format\n\t\t-A ->\tAutomaton verification\n\t\t-H ->\tEnable FLUX BALANCE\n\n";
+        std::cerr << "\n\nUSE: PN2ODE <path/net_name> [option]\n\tOption:\n\t\t-R ->\tExport R file\n\t\t-M ->\tGenelarized Mass Action policy\n\t\t-I ->\tInfinity servers policy (default)\n\t\t-O ->\tExport in Matlab format\n\t\t-A ->\tAutomaton verification\n\t\t-H ->\tEnable FLUX BALANCE\n\t\t-E -> \tUse Embedding Simulation\n\n";
         exit(EXIT_FAILURE);
 //automaton
     }
@@ -1171,6 +1172,9 @@ int initialize(int  argc,  char  *argv[]) {
                 OBJ_PATH = argv[ii+1];
             else
                 exit(1);
+            break;
+        case 'E' :
+            EMBEDDING= true;
             break;
         case 'C' :
             COMPACT_CPP= true;

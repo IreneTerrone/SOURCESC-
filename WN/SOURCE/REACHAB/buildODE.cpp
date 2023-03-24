@@ -88,6 +88,7 @@ extern "C" {
     extern bool MASSACTION;
     extern bool AUTOMATON;
     extern bool FLUXB;
+    extern bool EMBEDDING;
     extern std::vector<std::string> flux_names;
     int exceeded_markings_bound()
     {
@@ -368,10 +369,13 @@ set<std::string> function_names;
 for (int tt = 0; tt < ntr; tt++)
 {
     if (tabt[tt].general_function!=NULL){
-         if (!FLUXB)
-            hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value, map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time);\n";
-        else
+         if (FLUXB)
             hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value,vector<class FBGLPK::LPprob>& vec_fluxb,  map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time);\n";
+        else if (EMBEDDING)
+            hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value, map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time, const double& deltaBranch);\n";
+        else
+            hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value, map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time);\n";
+
     }
 }
 hout<<"};\n";
@@ -1049,11 +1053,12 @@ for (pp = 0; pp < npl; pp++)
             //if(tabt[tt].timing == TIMING_DETERMINISTIC ){
             //    hout << tabt[tt].trans_name << " sei dunque generale?" << endl; //Sono commossa.
            // }
-            if (FLUXB)
-                hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value,vector<class FBGLPK::LPprob>& vec_fluxb,  map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time);\n"; 
-            else
-                hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value, map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time);\n";
-
+         if (FLUXB)
+            hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value,vector<class FBGLPK::LPprob>& vec_fluxb,  map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time);\n";
+        else if (EMBEDDING)
+            hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value, map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time, const double& deltaBranch);\n";
+        else
+            hout<<"double "<<tabt[tt].trans_name<<"_general(double *Value, map <std::string,int>& NumTrans,  map <std::string,int>& NumPlaces,const vector <string>& NameTrans, const struct InfTr* Trans, const int Tran, const double& Time);\n";
         }
     }
     hout<<"};\n";

@@ -57,7 +57,7 @@ public class CppCommand {
         // java -ea -cp ${GREATSPN_BINDIR}/Editor.jar:${GREATSPN_BINDIR}/lib/antlr-runtime-4.2.1.jar editor.cli.CppCommand EsempiExpMTDep out.cpp
         String inBaseName = args[0];
         String outBaseName = args[1];
-        
+                
         // Parse the remaining arguments
         boolean fluxBalanceFlag = false;
         boolean branchFlag = false;
@@ -68,6 +68,7 @@ public class CppCommand {
             }
             if(args[i].equals("-branch")){
                 branchFlag = true;
+                System.out.println("Enabling branching modeling");
             }
             else {
                 System.err.println("Unknown argument: "+args[i]);
@@ -83,6 +84,7 @@ public class CppCommand {
         gspn.checkPage(proj, null, gspn, null);
         ParserContext context = new ParserContext(gspn);
         context.cppForFluxBalance = fluxBalanceFlag;
+        context.cppForBranching = branchFlag;
         gspn.compileParsedInfo(context);
 
         File cppFile = new File(outBaseName);

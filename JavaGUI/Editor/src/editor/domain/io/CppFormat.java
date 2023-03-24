@@ -69,7 +69,27 @@ public class CppFormat {
                                 out.println("   double rate = " + cppDelayExpr + ";");
                             }
 
-                        } 
+                        }                      
+                        if (branchFlag) {
+
+                            out.println("double " + trn.getUniqueName() + "_general(double *Value,\n"
+                                    + "                         map <string,int>& NumTrans,\n"
+                                    + "                         map <string,int>& NumPlaces,\n"
+                                    + "                         const vector<string> & NameTrans,\n"
+                                    + "                         const struct InfTr* Trans,\n"
+                                    + "                         const int T,\n"
+                                    + "                         const double& time,\n"
+                                    + "                         const double& deltaBranch) {\n");
+
+                            if (trn.isGeneral()) {
+                                String[] splitted = cppDelayExpr.split("\n");
+                                out.println("   " + splitted[0]);
+                                out.println("   double rate = " + splitted[1] + ";");
+
+                            } else {
+                                out.println("   double rate = " + cppDelayExpr + ";");
+                            }
+                        }
                         else {
 
                             out.println("double " + trn.getUniqueName() + "_general(double *Value,\n"

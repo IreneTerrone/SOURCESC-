@@ -85,6 +85,9 @@ public class ParserContext implements NodeNamespace {
     // Only used by the C++ code generator: is the delay being translated for the flux balance?
     public boolean cppForFluxBalance = false;
     
+    // Only used by the C++ code generator: is branching the solver used?
+    public boolean cppForBranching = false;
+    
     // ======= Fields used only by the FormulaEvaluator parser ======
     
     // Evaluation stack - avoids infinite evaluation depth

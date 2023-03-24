@@ -184,13 +184,6 @@ namespace SDE
     //@}
   };
 
-  enum solve_type {
-    Solve_LSODE,
-    Solve_SSA,
-    Solve_HLSODE,
-    Solve_TAUG,
-    Solve_BRANCH
-  };
 
   //! It uses for encoding the place information
   struct InfPlace
@@ -224,9 +217,11 @@ namespace SDE
    #ifdef CGLPK
     //!If CGLPK is defined then the vector of pointers to flux balance problems is passed as input parameter.
     double (*FuncT)(double *Value, vector<class FBGLPK::LPprob>& vec_fluxb, map <string,int>& NumTrans, map <string,int>& NumPlaces, const vector <string>& NameTrans, const struct InfTr* Trans,  const int Tran, const double& Time) {nullptr};
-    #else
+  #elif EMBEDDING 
+    double (*FuncT)(double *Value, map <string,int>& NumTrans, map <string,int>& NumPlaces, const vector <string>& NameTrans, const struct InfTr* Trans,  const int Tran, const double& Time, const double& deltaEmb) {nullptr};
+  #else
     double (*FuncT)(double *Value, map <string,int>& NumTrans, map <string,int>& NumPlaces, const vector <string>& NameTrans, const struct InfTr* Trans,  const int Tran, const double& Time) {nullptr};
-    #endif 
+  #endif 
   };
 
   //!Class Elem
@@ -418,9 +413,7 @@ namespace SDE
   int max_attempt {500};
     //!It stores the used seed
   long int seed {0};
-    //!It indicates the solve type used in this execution
-  solve_type solve;
-  
+    
 //automaton
 #ifdef AUTOMATON
   class automaton automaton;
@@ -432,7 +425,12 @@ namespace SDE
     vector<class FBGLPK::LPprob> vec_fluxb;
     bool Variability {false};
 #endif
-//fluxb    
+//fluxb
+//branching
+#ifdef EMBEDDING
+  double delta_branch {1};
+#endif    
+//branching
 public:
     //! Empty Constructor
   SystEq(void){};
