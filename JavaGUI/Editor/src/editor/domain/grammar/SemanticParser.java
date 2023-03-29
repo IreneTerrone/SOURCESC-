@@ -197,7 +197,7 @@ public class SemanticParser extends ExprLangBaseVisitor<FormattedFormula> {
         new UnaryFunct(true, ExprLangParser.FLOOR_FN, "floor(", ")"),
         new UnaryFunct(true, ExprLangParser.ABS_FN, "abs(", " )"),
         // General event PDF operator
-        new UnaryFunct(true, ExprLangParser.DIRAC_DELTA_FN, "DiracDelta[", "]"),};
+        new UnaryFunct(true, ExprLangParser.DIRAC_DELTA_FN, "[", "]"),};
     static final UnaryFunct pnproUnaryFunctions[] = {
         new UnaryFunct(true, ExprLangParser.OP_PAREN, "(", ")"),
         new UnaryFunct(false, ExprLangParser.SUB, "-", OperatorPos.PREFIX_SIMPLETERM),
@@ -221,7 +221,7 @@ public class SemanticParser extends ExprLangBaseVisitor<FormattedFormula> {
         new UnaryFunct(true, ExprLangParser.MULTISET_SUBCLASS, "Subclass[", "]"),
         new UnaryFunct(true, ExprLangParser.COLOR_ORDINAL, "CN[", "]"),
         // General event PDF operator
-        new UnaryFunct(true, ExprLangParser.DIRAC_DELTA_FN, "DiracDelta[", "]"),};
+        new UnaryFunct(true, ExprLangParser.DIRAC_DELTA_FN, "I[", "]"),};
     static final UnaryFunct apnnUnaryFunctions[] = {
         new UnaryFunct(true, ExprLangParser.OP_PAREN, "(", ")"),
         new UnaryFunct(false, ExprLangParser.SUB, " - ", OperatorPos.PREFIX_SIMPLETERM),
@@ -243,7 +243,7 @@ public class SemanticParser extends ExprLangBaseVisitor<FormattedFormula> {
         new UnaryFunct(false, ExprLangParser.NOT, "!", OperatorPos.PREFIX_SIMPLETERM),
         //        new UnaryFunct(true, ExprLangParser.MULTISET_CARD, "Card[", "]"),
         //        new UnaryFunct(true, ExprLangParser.MULTISET_SUBCLASS, "d(", ")"),
-        new UnaryFunct(true, ExprLangParser.DIRAC_DELTA_FN, "\\dist{dirac}{", "}"),};
+        new UnaryFunct(true, ExprLangParser.DIRAC_DELTA_FN, "\\dist{const}{", "}"),};
 
     static final UnaryFunct grmlUnaryFunctions[] = {
         new UnaryFunct(true, ExprLangParser.OP_PAREN, "<attribute name=\"expr\">", "</attribute>"),
