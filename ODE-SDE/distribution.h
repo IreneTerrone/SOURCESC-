@@ -2,7 +2,7 @@
 
 	inline double uniform(double min, double max, mt19937_64& generator){
 
-		if(min<0 || max<=min){
+		if(min<0 || max<min){
 			throw Exception("The parameters of the Uniform distribution are wrong. They must be different and greater than 0.\n\n");
 		}
 		uniform_real_distribution<double> unf_dis(min, max);

@@ -408,8 +408,6 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
                     }
                 }
             }
-
-            outfel << "enabling delle transizioni " << EnabledTransValueDis[t] << endl;
         }
     }
 
@@ -520,21 +518,18 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
     		number_events--;
     	}
 
-
 		//remove events if there are less tokens; the chosen transition is not updated here
 		// so I can do the loop normally
     	while(number_events < 0 && Trans[tran].events_size > 0 && future_event_list.getLenght() > 0)
     	{
     		outfel << "ciclo rimozione " << endl;
-    		int index = uniform(0, Trans[tran].events_size, generator);
+    		int index = uniform(0, Trans[tran].events_size-1, generator);
     		outfel << "numero elemento da rimuovere " << index << endl;
     		Event *event_removed = deleteEventInPosition(index, tran);
     		future_event_list.removeHeap(event_removed);
     		number_events++;
     		Trans[tran].events_size--;
     	}
-
-    	outfel << "events_size alla fine " << Trans[tran].events_size << endl;
 
     	//update with new/old value for next loop
     	PreviousEnabledTransValueDis[tran] = EnabledTransValueDis[tran];
@@ -544,7 +539,7 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
     }
 
 /**************************************************************/
-/* NAME :  Class deleteEventInPosition*/
+/* NAME :  Class addEventAtTheEnd*/
 /* DESCRIPTION : delete the i-th event in the event list updating the pointers */
 /**************************************************************/
 
@@ -552,25 +547,14 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 
     	if(Trans[tran].events_size==0){
     		Trans[tran].first_event = event;
+    		Trans[tran].last_event = event;
+    		return;
     	}
 
-    	int size = Trans[tran].events_size;
-    	Event *temp1 = Trans[tran].first_event;
-
-
-    	while(size > 1){
-
-        // Update temp1
-    		temp1 = temp1->getNext();
-
-    		size--;
-    	}
-
-    	temp1->setNext(event);
-    	event->setPrevious(temp1);
-
+    	Trans[tran].last_event->setNext(event);
+    	event->setPrevious(Trans[tran].last_event);
+    	Trans[tran].last_event = event;
     }
-
 
 
     
@@ -582,22 +566,22 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 
     Event* SystEq::deleteEventInPosition(int event_index, int tran){
 
-    	Event *temp1 = Trans[tran].first_event, *temp2 = NULL;
+    	Event *temp1 = Trans[tran].first_event, *temp2 = Trans[tran].first_event;
 
     // Deleting the head.
     	if (event_index == 0) {
-
     		if(Trans[tran].first_event != NULL) {
      	  		// Update head
-    			Trans[tran].first_event = temp1->getNext();
+    			Trans[tran].first_event = Trans[tran].first_event->getNext();
     			//if it's not the last element of the list
-    			if(temp1->getNext() != NULL){
+    			if(Trans[tran].first_event != NULL)
     				Trans[tran].first_event ->setPrevious(NULL);
-    			}
-
-    			return temp1;
     		}
     	}
+    	if(event_index==Trans[tran].events_size-1){
+    		Trans[tran].last_event = Trans[tran].last_event->getPrevious();
+    	}
+
 
     // Traverse the list to
     // find the node to be deleted.
@@ -614,13 +598,11 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 
     	Event *next = temp1->getNext();
 
-
     // Change the next pointer of the previous node.
     	temp2->setNext(next);
 
     	if(next != NULL)
     		(next)->setPrevious(temp2);
-
 
     	return temp1;
 
@@ -635,6 +617,7 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 
     	Event *prev = event->getPrevious();
     	int tran = event ->getIndexTran();
+    	bool head_or_tail = false;
 
 
     // Deleting the head.
@@ -645,8 +628,17 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
     		//it it's not the last element of the list
     		if(Trans[tran].first_event != NULL)
     			Trans[tran].first_event ->setPrevious(NULL);
-    		return;
+    		head_or_tail = true;
     	}
+
+
+    	if(event == Trans[tran].last_event){
+    		Trans[tran].last_event = Trans[tran].last_event->getPrevious();
+    		head_or_tail = true;
+    	}
+
+    	if(head_or_tail)
+    		return;
 
     	Event *next = event->getNext();
 
@@ -654,6 +646,7 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
     	prev->setNext(next);
     	if(next !=NULL)
     		(next)->setPrevious(prev); 
+
 
     }
 
@@ -3407,19 +3400,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 			out<<endl<<itime;
 		}
 
-		//initialization for future event list
-		if(future_event_list.getLenght() > 0){
-
-			future_event_list.deleteHeap();
-
-			for(int t=1; t<size_notExpTran; t++){
-				PreviousEnabledTransValueDis[t] = 0;
-				Trans[SetTranNotExp[t]].first_event = NULL;
-				Trans[SetTranNotExp[t]].events_size = 0;
-			}
-
-		}
-
 
 		for (int j=0;j<nPlaces;j++){
 			Value[j]=ValuePrv[j]=ValueInit[j];
@@ -3507,6 +3487,20 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 		for (int i=0;i<nPlaces;i++)
 		{
 			Mean[i]+=FinalValueXRun[i][run]=Value[i];
+		}
+
+		Tran_previous = -1;
+		//initialization for future event list
+		if(future_event_list.getLenght() > 0){
+
+			future_event_list.deleteHeap();
+
+			for(int t=1; t<size_notExpTran; t++){
+				PreviousEnabledTransValueDis[t] = 0;
+				Trans[SetTranNotExp[t]].first_event = NULL;
+				Trans[SetTranNotExp[t]].events_size = 0;
+			}
+
 		}
 
 		++run;

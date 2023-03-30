@@ -104,7 +104,6 @@
 //automaton
 #ifdef AUTOMATON
   #include "automa.hpp"
- // #include <boost/math/distributions/binomial.hpp>
 #endif
 //automaton
 
