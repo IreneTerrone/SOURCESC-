@@ -38,40 +38,37 @@ public:
     //!Deconstruct
     ~Event() {};
 
+    //!get the time in which the event fires
     inline double getTime(){
         return this -> time;
     }
 
+    //! get the index of the event inside the future event list
     inline int getIndexHeap(){
         return this -> index_heap;
     }
 
+    //!get the index of the transition associated to the event
     inline int getIndexTran(){
         return this -> index_trans;
     }
 
+    //!get the next event in the linked list of the transition
     inline Event* getNext(){
         return this -> next;
     }
 
+    //!get the preovious event in the linked list of the transition
     inline Event* getPrevious(){
         return this -> previous;
     }
 
-
-    inline void setIndexHeap(int index_h){
-        this -> index_heap = index_h;
-    }
-
-    inline void setTime(double time){
-        this -> time = time;
-    }
-
-
+    //!set the next event in the linked list
     inline void setNext(Event* event){
         this -> next = event;
     }
 
+    //!set the previous event in the linked list
     inline void setPrevious(Event* event){
         this -> previous = event;
     }
@@ -79,14 +76,13 @@ public:
 };
 
 
-//!Max Heap
+//!Min Heap
     /*!
    *  Heap data structure with reverse index
    */
 
 class min_heap {
 
-    //size_t N;
     std::vector<Event*> heap;
 
     void percolateUp(Event* elem) {
@@ -185,7 +181,6 @@ public:
 
     Event* popHeap() {
         Event* elem0 = heap[0];
-        //removeHeap(elem0);        
         return elem0;
     }
 

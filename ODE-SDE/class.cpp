@@ -540,7 +540,7 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 
 /**************************************************************/
 /* NAME :  Class addEventAtTheEnd*/
-/* DESCRIPTION : delete the i-th event in the event list updating the pointers */
+/* DESCRIPTION : add a new element at the end of the event list of a particular transition */
 /**************************************************************/
 
     void SystEq::addEventAtTheEnd(Event* event, int tran){
@@ -609,13 +609,12 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
     }
 
 /**************************************************************/
-/* NAME :  Class deleteEventInPosition*/
-/* DESCRIPTION : delete the i-th event in the event list updating the pointers */
+/* NAME :  Class deleteEvent*/
+/* DESCRIPTION : delete the event passed as parameter in the event list updating the pointers */
 /**************************************************************/
 
     void SystEq::deleteEvent(Event* event){
 
-    	Event *prev = event->getPrevious();
     	int tran = event ->getIndexTran();
     	bool head_or_tail = false;
 
@@ -641,11 +640,12 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
     		return;
 
     	Event *next = event->getNext();
+    	Event *prev = event->getPrevious();
 
     // Change the next pointer of the previous node.
     	prev->setNext(next);
     	if(next !=NULL)
-    		(next)->setPrevious(prev); 
+    		next->setPrevious(prev); 
 
 
     }
@@ -3376,8 +3376,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 	//All transitions
 		if (Trans[i].timing == NON_EXP_GEN){
 			SetTranNotExp[++SetTranNotExp[0]]=i; 
-		//SetTran[++SetTran[0]]=i;
-		//Trans[i].enable=false;
 		}
 		else 
 		SetTranExp[++SetTranExp[0]]=i;

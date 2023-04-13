@@ -3,15 +3,13 @@
 	inline double uniform(double min, double max, mt19937_64& generator){
 
 		if(min<0 || max<min){
-			throw Exception("The parameters of the Uniform distribution are wrong. They must be different and greater than 0.\n\n");
+			throw Exception("The parameters of the Uniform distribution are wrong. The second must be greater than the first and they must be greater than 0.\n\n");
 		}
 		uniform_real_distribution<double> unf_dis(min, max);
 		double value = unf_dis(generator);
 		return value;
-		//return min;
 	}
 
-	//da pensare se tenere o meno. Risolverebbe il problema del controllo nel file class.cpp
 	inline double dirac_delta(double value){
 
 		if(value<0){

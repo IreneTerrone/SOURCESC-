@@ -142,17 +142,9 @@
 #include "reverse_heap.h"
 #endif 
 
-/*#ifndef __DISTRIBUTION_H__
-#define __DISTRIBUTION_H__
-#include "distribution.h"
-#endif */
-
 
 namespace SDE
 {
-
-  //#define epsilon 0.0001
-  //#define epsilon 100000
   #define INCDEC 0.0
   #define DEFAULT 4294967295U
   #define DEBUG 1
