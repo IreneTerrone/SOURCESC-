@@ -58,6 +58,16 @@ public:
         return this -> next;
     }
 
+    inline void setIndexHeap(int index_h){
+        this -> index_heap = index_h;
+    }
+
+    inline void setTime(double time){
+        this -> time = time;
+    }
+
+
+
     //!get the preovious event in the linked list of the transition
     inline Event* getPrevious(){
         return this -> previous;

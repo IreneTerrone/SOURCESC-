@@ -443,6 +443,7 @@ namespace SDE
   void addEventAtTheEnd(Event* event, int tran);
   //stream TEMPORANEO
   ofstream outfel{"outfel.txt"};
+  ofstream outtime{"outtime.txt"};
 
 //automaton
 #ifdef AUTOMATON

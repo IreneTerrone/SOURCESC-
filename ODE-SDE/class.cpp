@@ -2834,11 +2834,13 @@ int SystEq::getComputeTau(int SetTranExp[], double& nextTimePoint,double t){
 
                    */
 				sumRate+=EnabledTransValueDis[SetTranExp[i]]*Trans[SetTranExp[i]].rate;
+
 			}
 
 			TransRate[i-1]=sumRate;
 		//cout<<"i "<< i<<" sumRate:"<<sumRate<<NameTrans[SetTranExp[i]]<<endl;
 		}
+
 	}
 
 	if (sumRate==0.0 && future_event_list.getLenght() == 0)
@@ -2865,6 +2867,8 @@ int SystEq::getComputeTau(int SetTranExp[], double& nextTimePoint,double t){
 			nextTimePoint = general_tau;
 			outfel << "vince general_tau" << endl;
 			outfel << "trans "<<NameTrans[lo]<<" id"<<lo+1<<"\n\n";
+			outtime << nextTimePoint << ",";
+			outtime << NameTrans[lo] << endl;
 			return lo;			
 		}
 	}
@@ -2891,6 +2895,8 @@ int SystEq::getComputeTau(int SetTranExp[], double& nextTimePoint,double t){
 		//}
 
 	outfel << "trans "<<NameTrans[SetTranExp[lo+1]]<<" id"<<lo+1<<"\n\n";
+	outtime << nextTimePoint << ",";
+	outtime << NameTrans[SetTranExp[lo+1]] << endl;
 	return SetTranExp[lo+1];
 }
 
@@ -3509,6 +3515,7 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 
 	cout<<"\n\nSolution at time "<<Max_Time<<":\n";
 	outfel.close();
+	outtime.close();
 }
 
 

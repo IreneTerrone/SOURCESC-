@@ -38,7 +38,7 @@
 	}
 
 	//aspetta ma questa è una unary function!
-	inline double exponential(double lambda, mt19937_64& generator){
+	inline double exponential(double lambda, double nan, mt19937_64& generator){
 
 		exponential_distribution<double> exp_dis(lambda);
 		double value = exp_dis(generator);
