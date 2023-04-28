@@ -442,8 +442,8 @@ namespace SDE
   //!add event ad the end of the list
   void addEventAtTheEnd(Event* event, int tran);
   //stream TEMPORANEO
-  ofstream outfel{"outfel.txt"};
-  ofstream outtime{"outtime.txt"};
+  //ofstream outfel{"outfel.txt"};
+  //ofstream outtime{"outtime.txt"};
 
 //automaton
 #ifdef AUTOMATON
