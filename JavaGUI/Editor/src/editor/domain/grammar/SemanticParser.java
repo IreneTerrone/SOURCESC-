@@ -39,7 +39,7 @@ import org.antlr.v4.runtime.tree.TerminalNode;
 public class SemanticParser extends ExprLangBaseVisitor<FormattedFormula> {
 
     // The context in which formulas are checked and parsed.
-    private ParserContext context;
+    protected ParserContext context;
 
     // The parse flags
     private final int parseFlags;
@@ -674,7 +674,8 @@ public class SemanticParser extends ExprLangBaseVisitor<FormattedFormula> {
 
             case APNN:
                 return format(true, "if ", cond, " then ", e1, " else ", e2);
-
+            case CPP:
+                return format(true, "if(", cond, "){\n ", e1, "}\n else {", e2, "\n} ");
             default:
                 throw new UnsupportedOperationException("formatIfThenElse: unsupported lang");
         }
@@ -1353,8 +1354,7 @@ public class SemanticParser extends ExprLangBaseVisitor<FormattedFormula> {
                 String file_name = ctx.STRING_LITERAL().toString();
                 String define_name = file_name.substring(1, file_name.length() - 1).replace(".", "_");
                 //return format(true, "class_files[", define_name, "].getConstantFromTimeTable(", visit(ctx.intExpr(0)), ",", visit(ctx.intExpr(1)), ")");
-               return format(true, "class_files[", define_name, "].getConstantFromTimeTable(time, ", visit(ctx.intExpr(1)), ")");
-
+                return format(true, "class_files[", define_name, "].getConstantFromTimeTable(time, ", visit(ctx.intExpr(1)), ")");
             default:
                 throw new UnsupportedOperationException();
         }
@@ -1434,6 +1434,8 @@ public class SemanticParser extends ExprLangBaseVisitor<FormattedFormula> {
                 return format(true, "<numberconstant value=\"" + (value ? "true" : "false") + "\">");
             case NETLOGO:
                 return format(true, value ? "TRUE" : "FALSE");
+            case CPP:
+                return format(true, value ? "true" : "false");
             default:
                 throw new UnsupportedOperationException("visitBoolConst");
         }
