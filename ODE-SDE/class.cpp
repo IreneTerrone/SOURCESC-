@@ -487,18 +487,10 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 
     	int number_events = EnabledTransValueDis[tran] - PreviousEnabledTransValueDis[tran];
 
-
-    	//outfel << "Sono in updateFutureEventList con la transizione " << NameTrans[tran]<< endl;
-    	//outfel << "lunghezza future_event_list all'inizio " << future_event_list.getLenght() << endl;
-    	//outfel << number_events << " numero eventi da manipolare " << endl;
-
     	//if the transition is already fired one event has already been popped out
     	if(tran==prev_fired){
     		number_events++;
-    		//outfel << "ma se la transizione è scattata allora sono " << number_events << endl;
     	}
-
-    	//outfel << "events size prima dell'aggiunta " << Trans[tran].events_size << endl;
 
     	while(number_events>0)
     	{
@@ -509,7 +501,6 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 #else
     		double time_event = Trans[tran].FuncT(ValuePrv,NumTrans,NumPlaces,NameTrans,Trans,tran,time);
 #endif 	
-    		//outfel <<"ciclo aggiunta " << endl;
     		time_event = time_event + time;
     		Event *event_distribution = new Event(time_event, tran);
     		future_event_list.pushHeap(event_distribution);
@@ -522,9 +513,7 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 		// so I can do the loop normally
     	while(number_events < 0 && Trans[tran].events_size > 0 && future_event_list.getLenght() > 0)
     	{
-    		//outfel << "ciclo rimozione " << endl;
     		int index = uniform(0, Trans[tran].events_size-1, generator);
-    		//outfel << "numero elemento da rimuovere " << index << endl;
     		Event *event_removed = deleteEventInPosition(index, tran);
     		future_event_list.removeHeap(event_removed);
     		number_events++;
@@ -533,8 +522,6 @@ inline void SystEqMas::getValTranFire(double* ValuePrv)
 
     	//update with new/old value for next loop
     	PreviousEnabledTransValueDis[tran] = EnabledTransValueDis[tran];
-
-    	//outfel << future_event_list.getLenght() << " Lunghezza future event list alla fine\n\n";
 
     }
 
@@ -2849,12 +2836,9 @@ int SystEq::getComputeTau(int SetTranExp[], double& nextTimePoint,double t){
 
 	tau=(ExpD(generator)+t);
     //cout<<"\nReaction:"<<tau<<" "<<tau-t<<endl;
-	//outfel << "tau da confrontare " << tau << endl;
 
-	//outfel << "lunghezza future event list " << future_event_list.getLenght() << endl;
 	if(future_event_list.getLenght() > 0) {
 		general_tau = future_event_list.topWeight();
-		//outfel << "general_tau " << general_tau << endl;
 		if(general_tau<tau){
 			if(general_tau >= nextTimePoint)
 				return -1;
@@ -2863,12 +2847,7 @@ int SystEq::getComputeTau(int SetTranExp[], double& nextTimePoint,double t){
 			deleteEvent(top_list);
 			future_event_list.removeHeap(top_list);
 			Trans[lo].events_size--;
-			//outfel << " lunghezza eventi associati alla transizione " << Trans[lo].events_size << endl;
 			nextTimePoint = general_tau;
-			//outfel << "vince general_tau" << endl;
-			//outfel << "trans "<<NameTrans[lo]<<" id"<<lo+1<<"\n\n";
-			//outtime << nextTimePoint << ",";
-			//outtime << NameTrans[lo] << endl;
 			return lo;			
 		}
 	}
@@ -2876,7 +2855,6 @@ int SystEq::getComputeTau(int SetTranExp[], double& nextTimePoint,double t){
 	if(tau >= nextTimePoint)
 		return -1;
 	nextTimePoint=tau;
-	//outfel << "vince tau: " << tau << endl;
 	std::uniform_real_distribution<> UnfRealD(0.0,1.0);
 	double val=UnfRealD(generator)*sumRate;
 
@@ -2894,9 +2872,6 @@ int SystEq::getComputeTau(int SetTranExp[], double& nextTimePoint,double t){
 	}
 		//}
 
-	//outfel << "trans "<<NameTrans[SetTranExp[lo+1]]<<" id"<<lo+1<<"\n\n";
-	//outtime << nextTimePoint << ",";
-	//outtime << NameTrans[SetTranExp[lo+1]] << endl;
 	return SetTranExp[lo+1];
 }
 
@@ -3397,8 +3372,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 			cout.flush();
 		}
 
-		//outfel << "run numero " << run << endl;
-
 		//Initialization for each run
 		if(Info){
 			out<<endl<<itime;
@@ -3437,7 +3410,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 
             //time=nextTimePoint;
 			getValTranFire(Value);
-			//outfel << time << " tempo a cui sono" << endl;
 
 		//update of future event list
 			for(int t=1;t<size_notExpTran;t++)
@@ -3455,7 +3427,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 				int size=(Trans[Tran].Places).size();
 				for (int i=0;i<size;++i){
 					Value[(Trans[Tran].Places[i]).Id]+=(Trans[Tran].Places[i]).Card;
-					//outfel << Value[(Trans[Tran].Places[i]).Id] << " valore del posto " << endl;
 				}
 			}
 
@@ -3514,8 +3485,6 @@ void SystEq::SolveSSA(double h,double perc1,double perc2,double Max_Time,int Max
 	future_event_list.deleteHeap();
 
 	cout<<"\n\nSolution at time "<<Max_Time<<":\n";
-	//outfel.close();
-	//outtime.close();
 }
 
 
